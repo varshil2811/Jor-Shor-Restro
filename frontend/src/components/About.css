@@ -1,0 +1,422 @@
+.about-section {
+  background-color: var(--bg-light);
+  overflow: visible;
+}
+
+.about-section .container {
+  overflow: visible;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .about-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+}
+
+.about-image-wrapper {
+  position: relative;
+  padding-bottom: 30px; /* space for the badge */
+}
+
+@media (max-width: 768px) {
+  .about-image-wrapper {
+    padding-bottom: 20px;
+  }
+}
+
+.about-image {
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  width: 100%;
+}
+
+.about-experience-badge {
+  position: absolute;
+  bottom: -10px;
+  right: 10px;
+  background: linear-gradient(145deg, var(--primary-red), #461420);
+  color: var(--bg-white);
+  padding: 1.5rem;
+  border-radius: 50%;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  border: 2px solid rgba(212, 175, 55, 0.45);
+}
+
+@media (max-width: 480px) {
+  .about-experience-badge {
+    width: 100px;
+    height: 100px;
+    padding: 1rem;
+    right: 8px;
+  }
+
+  .about-experience-badge .years {
+    font-size: 1.8rem !important;
+  }
+
+  .about-experience-badge .text {
+    font-size: 0.65rem !important;
+  }
+}
+
+.about-experience-badge .years {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.about-experience-badge .text {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.about-content .section-title.text-left {
+  text-align: left;
+}
+
+.about-content .section-title.text-left::after {
+  left: 0;
+  transform: none;
+}
+
+.about-subtitle {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.about-text {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 1.05rem;
+}
+
+.about-features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 576px) {
+  .about-features {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.feature h4 {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+  margin-bottom: 0.5rem;
+}
+
+.feature p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.about-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+@media (max-width: 480px) {
+  .about-actions {
+    flex-direction: column;
+  }
+
+  .about-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .about-subtitle {
+    font-size: 1.2rem;
+  }
+}
+
+/* --- Extra Details Modal --- */
+.extra-details-modal {
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+}
+
+.extra-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.extra-detail-category {
+  background-color: var(--bg-cream);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-top: 3px solid var(--accent-gold);
+}
+
+.detail-category-title {
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.detail-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .extra-details-modal {
+    padding: 1.5rem;
+  }
+}
+
+/* --- Restaurant Features (opens below About) --- */
+.premium-btn {
+  transition: all 0.3s ease;
+}
+.premium-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(212, 175, 55, 0.24);
+}
+
+.restaurant-insights {
+  margin-top: 3.5rem;
+  padding: 2.2rem 1.8rem 2.6rem;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(212, 175, 55, 0.12), transparent 35%),
+    radial-gradient(circle at bottom left, rgba(111, 31, 47, 0.2), transparent 42%),
+    linear-gradient(180deg, #1b1511 0%, #14100d 100%);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 28px rgba(212, 175, 55, 0.06);
+  overflow: visible;
+  /* Keep section clear of the fixed header when scrolling into view */
+  scroll-margin-top: 96px;
+}
+
+.insights-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.premium-modal-eyebrow {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.insights-header h3 {
+  font-family: var(--font-heading);
+  color: #efe7db;
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.02em;
+}
+
+.insights-header p {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.premium-detail-card {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.04), transparent 45%),
+    linear-gradient(180deg, #221b16 0%, #1a1511 100%);
+  padding: 1.25rem 1.2rem 1.15rem;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: visible;
+  height: auto;
+}
+
+.premium-detail-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 18px 18px 0 0;
+  background: linear-gradient(90deg, var(--accent-gold), rgba(212, 175, 55, 0.15));
+}
+
+.premium-detail-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(212, 175, 55, 0.45);
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.42),
+    0 0 18px rgba(212, 175, 55, 0.1);
+}
+
+.card-header-flex {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+.icon-box {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.05));
+  color: var(--accent-gold);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.premium-detail-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  font-weight: 600;
+  margin: 0;
+  color: #e6c356;
+  letter-spacing: 0.01em;
+}
+
+.premium-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.premium-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+  color: #d8cfc1;
+  line-height: 1.45;
+}
+
+.premium-detail-item span {
+  flex: 1;
+}
+
+.check-icon {
+  color: var(--accent-gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 992px) {
+  .insights-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .restaurant-insights {
+    margin-top: 2.4rem;
+    padding: 1.4rem 1rem 1.8rem;
+  }
+
+  .insights-header h3 {
+    font-size: 1.55rem;
+  }
+
+  .insights-grid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+}
+
+/* ── about image float effect ── */
+.about-image {
+  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.5s ease;
+}
+.about-image-wrapper:hover .about-image {
+  transform: scale(1.03) translateY(-4px);
+  box-shadow: 0 28px 56px rgba(0,0,0,0.65), 0 0 30px rgba(212,175,55,0.15);
+}
+.about-experience-badge {
+  animation: goldPulse 3.5s ease-in-out infinite;
+}
+/* feature card hover */
+.premium-detail-card {
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.premium-detail-card:hover {
+  transform: translateY(-5px) scale(1.02);
+}
