@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
  * Returns [ref, isVisible].
  * Re-observes automatically when the DOM node attached to ref changes.
  */
-export function useInView(threshold = 0.15, once = true) {
+export function useInView(threshold = 0.15, once = false) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
