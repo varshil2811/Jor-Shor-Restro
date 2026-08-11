@@ -35,7 +35,7 @@
   border-radius: 10px;
   cursor: pointer;
   aspect-ratio: 16 / 9;
-  border: 1px solid rgba(212, 175, 55, 0.22);
+  border: 1px solid rgba(52, 69, 58, 0.22);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -46,8 +46,8 @@
 
 .gallery-item:hover {
   transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.55), 0 0 18px rgba(212, 175, 55, 0.14);
-  border-color: rgba(212, 175, 55, 0.45);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.55), 0 0 18px rgba(52, 69, 58, 0.14);
+  border-color: rgba(52, 69, 58, 0.45);
   z-index: 2;
 }
 
@@ -161,7 +161,7 @@
   max-width: 90%;
   max-height: 85vh;
   object-fit: contain;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 18px rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 18px rgba(52, 69, 58, 0.15);
   border-radius: 6px;
   animation: scaleUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }

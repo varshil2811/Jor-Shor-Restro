@@ -64,7 +64,7 @@ const Gallery = () => {
 
         {loading ? (
           <div className="text-center py-5">
-            <Loader className="animate-spin" size={32} color="#8B0000" />
+            <Loader className="animate-spin" size={32} color="#b4a081" />
             <p className="mt-2">Loading gallery...</p>
           </div>
         ) : galleryImages.length === 0 ? (

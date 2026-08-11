@@ -171,15 +171,19 @@ const ReservationContact = () => {
             </div>
 
             {/* Map */}
-            <div className="map-card">
-              <iframe
-                src="https://maps.google.com/maps?q=Jor%20Shor%20Restro,%20Pramukh%20Arcade%202,%20Kudasan,%20Gandhinagar,%20Gujarat%20382421&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                title="Google Maps – Jor Shor Restro"
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
+            <a 
+              href="https://maps.google.com/?q=Jor+Shor+Restro,+Pramukh+Arcade+2,+Kudasan,+Gandhinagar,+Gujarat+382421" 
+              target="_blank" 
+              rel="noreferrer" 
+              className="map-card"
+            >
+              <div className="map-overlay"></div>
+              <div className="map-content">
+                <MapPin size={40} className="map-pin-icon" />
+                <h3>Get Directions</h3>
+                <p>Pramukh Arcade 2, Kudasan, Gandhinagar</p>
+              </div>
+            </a>
 
           </div>
 

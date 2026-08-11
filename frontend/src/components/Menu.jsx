@@ -52,7 +52,7 @@ const Menu = () => {
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(28);
-      doc.setTextColor(212, 175, 55); // gold
+      doc.setTextColor(52, 69, 58); // gold
       doc.text('JOR SHOR RESTRO', pageWidth / 2, 20, { align: 'center' });
 
       doc.setFontSize(11);
@@ -80,7 +80,7 @@ const Menu = () => {
         doc.roundedRect(14, yOffset - 5, pageWidth - 28, 12, 3, 3, 'F');
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(13);
-        doc.setTextColor(212, 175, 55);
+        doc.setTextColor(52, 69, 58);
         doc.text(category.category, 20, yOffset + 3);
         yOffset += 14;
 
@@ -102,11 +102,11 @@ const Menu = () => {
             fontSize: 9,
             cellPadding: 3,
             textColor: [40, 30, 20],
-            lineColor: [212, 175, 55],
+            lineColor: [52, 69, 58],
             lineWidth: 0.2,
           },
           headStyles: {
-            fillColor: [212, 175, 55],
+            fillColor: [52, 69, 58],
             textColor: [26, 19, 14],
             fontStyle: 'bold',
             fontSize: 9,
@@ -176,7 +176,7 @@ const Menu = () => {
 
         {loading ? (
           <div className="text-center py-5">
-            <Loader className="animate-spin" size={32} color="#8B0000" />
+            <Loader className="animate-spin" size={32} color="#b4a081" />
             <p className="mt-2">Loading menu...</p>
           </div>
         ) : (

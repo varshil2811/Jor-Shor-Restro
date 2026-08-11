@@ -464,8 +464,8 @@ const AdminPanel = () => {
 
           {/* ══════════ GALLERY ══════════ */}
           {activeTab === 'gallery' && (
-            <div className="ap-fade">
-              <div className="ap-card ap-card-narrow">
+            <div className="ap-fade ap-two-col">
+              <div className="ap-card">
                 <h3 className="ap-card-title"><ImagePlus size={16}/> Upload New Photo</h3>
                 <form onSubmit={handleGalleryUpload} className="ap-form">
                   <div className="ap-field">
@@ -495,7 +495,7 @@ const AdminPanel = () => {
                 </form>
               </div>
 
-              <div className="ap-card" style={{ marginTop:'1.5rem' }}>
+              <div className="ap-card">
                 <h3 className="ap-card-title"><ImageIcon size={16}/> Gallery Photos ({gallery.length})</h3>
                 <div className="ap-gallery-grid">
                   {gallery.map(img => (

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, PhoneCall } from 'lucide-react';
+import { Menu, X, PhoneCall, Home, Utensils, Image as ImageIcon, Info, Star, Mail } from 'lucide-react';
 import Logo from './Logo';
 import './Header.css';
 
@@ -31,12 +31,12 @@ const Header = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Home',    href: '#home' },
-    { name: 'Menu',    href: '#menu' },
-    { name: 'Gallery', href: '#gallery' },
-    { name: 'About',   href: '#about' },
-    { name: 'Reviews', href: '#reviews' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Home',    href: '#home',    icon: Home },
+    { name: 'Menu',    href: '#menu',    icon: Utensils },
+    { name: 'Gallery', href: '#gallery', icon: ImageIcon },
+    { name: 'About',   href: '#about',   icon: Info },
+    { name: 'Reviews', href: '#reviews', icon: Star },
+    { name: 'Contact', href: '#contact', icon: Mail }
   ];
 
   return (
@@ -50,22 +50,27 @@ const Header = () => {
         </a>
 
         <nav className="desktop-nav">
-          <ul>
-            {navLinks.map(link => (
-              <li key={link.name}>
-                <a
-                  href={link.href}
-                  className={activeSection === link.href.slice(1) ? 'nav-active' : ''}
-                >
-                  {link.name}
-                </a>
-              </li>
-            ))}
+          <ul className="nav-pill">
+            {navLinks.map(link => {
+              const Icon = link.icon;
+              return (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className={activeSection === link.href.slice(1) ? 'nav-active' : ''}
+                    aria-label={link.name}
+                  >
+                    <Icon size={18} strokeWidth={2.5} />
+                    <span className="nav-label">{link.name}</span>
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className="header-actions">
-          <a href="#contact" className="btn btn-primary cta-btn">
+          <a href="#contact" className="btn nav-cta-btn">
             <PhoneCall size={18} style={{ marginRight: '8px' }} />
             Reserve a Table
           </a>

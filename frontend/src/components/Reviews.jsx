@@ -40,16 +40,16 @@ const renderStars = (rating) => {
   const hasHalfStar = rating % 1 !== 0;
 
   for (let i = 0; i < fullStars; i++) {
-    stars.push(<Star key={`full-${i}`} className="star filled" size={18} fill="#D4AF37" color="#D4AF37" />);
+    stars.push(<Star key={`full-${i}`} className="star filled" size={18} fill="#b4a081" color="#b4a081" />);
   }
 
   if (hasHalfStar) {
-    stars.push(<StarHalf key="half" className="star half" size={18} fill="#D4AF37" color="#D4AF37" />);
+    stars.push(<StarHalf key="half" className="star half" size={18} fill="#b4a081" color="#b4a081" />);
   }
 
   const emptyStars = 5 - Math.ceil(rating);
   for (let i = 0; i < emptyStars; i++) {
-    stars.push(<Star key={`empty-${i}`} className="star empty" size={18} color="#D4AF37" />);
+    stars.push(<Star key={`empty-${i}`} className="star empty" size={18} color="#b4a081" />);
   }
 
   return stars;
@@ -120,8 +120,8 @@ const Reviews = () => {
       >
         <Star
           size={22}
-          fill={formData.rating >= value ? '#D4AF37' : 'transparent'}
-          color="#D4AF37"
+          fill={formData.rating >= value ? '#b4a081' : 'transparent'}
+          color="#b4a081"
         />
       </button>
     ));

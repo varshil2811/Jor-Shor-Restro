@@ -2,24 +2,24 @@
 
 :root {
   /* Colors */
-  --primary-red: #6f1f2f;
+  --primary-red: #b4a081;
   /* Deep burgundy */
-  --primary-red-hover: #8f2c3f;
-  --accent-gold: #d4af37;
+  --primary-red-hover: #d2bd96;
+  --accent-gold: #b4a081;
   /* Signature warm gold */
-  --accent-gold-hover: #e6c356;
-  --bg-cream: #121212;
+  --accent-gold-hover: #d2bd96;
+  --bg-cream: #34453a;
   /* Global base layer */
-  --bg-white: #1a1512;
+  --bg-white: #2f3d35;
   /* Elevated dark layer */
-  --bg-light: #201914;
+  --bg-light: #3e493d;
   /* Card/panel layer */
   --text-dark: #efe7db;
   /* Warm off-white headings */
   --text-muted: #cbbfae;
   /* Soft light-gray body text */
   --text-light: #f8f3ea;
-  --border-color: #463628;
+  --border-color: #434f40;
 
   /* Typography */
   --font-heading: 'Playfair Display', serif;
@@ -29,9 +29,9 @@
   --max-width: 1200px;
 
   /* Shadows */
-  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(212, 175, 55, 0.1);
-  --shadow-md: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 18px rgba(212, 175, 55, 0.08);
-  --shadow-lg: 0 18px 38px rgba(0, 0, 0, 0.6), 0 0 24px rgba(212, 175, 55, 0.08);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(52, 69, 58, 0.1);
+  --shadow-md: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 18px rgba(52, 69, 58, 0.08);
+  --shadow-lg: 0 18px 38px rgba(0, 0, 0, 0.6), 0 0 24px rgba(52, 69, 58, 0.08);
 
   /* Transitions */
   --transition-fast: 0.2s ease;
@@ -57,9 +57,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-muted);
   background:
-    radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.08), transparent 30%),
+    radial-gradient(circle at 15% 10%, rgba(52, 69, 58, 0.08), transparent 30%),
     radial-gradient(circle at 80% 25%, rgba(111, 31, 47, 0.2), transparent 35%),
-    linear-gradient(180deg, #121212 0%, #171310 45%, #121212 100%);
+    linear-gradient(180deg, #34453a 0%, #353b2c 45%, #34453a 100%);
 }
 
 h1,
@@ -130,53 +130,92 @@ button {
   transform: translateX(-50%);
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, rgba(212, 175, 55, 0.35), var(--accent-gold), rgba(212, 175, 55, 0.35));
+  background: linear-gradient(90deg, rgba(52, 69, 58, 0.35), var(--accent-gold), rgba(52, 69, 58, 0.35));
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  border-radius: 4px;
-  transition: all var(--transition-fast);
-  letter-spacing: 0.02em;
+  padding: 0.85rem 1.8rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.03em;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Shine effect on hover */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:active {
+  transform: translateY(1px) !important;
+}
+
+.btn svg {
+  margin-right: 8px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:hover svg {
+  transform: scale(1.1) rotate(-5deg);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-gold) 0%, #b6902d 100%);
-  color: #1b140f;
-  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.28);
+  background: var(--accent-gold);
+  color: var(--bg-white);
+  box-shadow: 0 4px 14px rgba(180, 160, 129, 0.25);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--accent-gold-hover) 0%, #c9a13b 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(212, 175, 55, 0.35);
+  background: var(--accent-gold-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(180, 160, 129, 0.45);
 }
 
 .btn-secondary {
   background-color: transparent;
   color: var(--accent-gold);
-  border: 1px solid rgba(212, 175, 55, 0.65);
+  border: 1.5px solid var(--accent-gold);
 }
 
 .btn-secondary:hover {
-  background-color: rgba(212, 175, 55, 0.12);
-  color: var(--text-dark);
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.22);
+  background-color: var(--accent-gold);
+  color: var(--bg-white);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(180, 160, 129, 0.3);
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, var(--primary-red) 0%, #4f121f 100%);
-  color: var(--text-light);
+  background: var(--bg-light);
+  color: var(--accent-gold);
+  border: 1.5px solid var(--border-color);
 }
 
 .btn-accent:hover {
-  background: linear-gradient(135deg, var(--primary-red-hover) 0%, #6c1b2d 100%);
-  box-shadow: 0 0 16px rgba(111, 31, 47, 0.35);
+  background: var(--bg-white);
+  transform: translateY(-3px);
+  border-color: var(--accent-gold);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 /* Grid Layouts */
@@ -373,11 +412,11 @@ body {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    box-shadow: 0 0 0 0 rgba(52, 69, 58, 0);
   }
 
   50% {
-    box-shadow: 0 0 24px 6px rgba(212, 175, 55, 0.22);
+    box-shadow: 0 0 24px 6px rgba(52, 69, 58, 0.22);
   }
 }
 
@@ -413,11 +452,11 @@ body {
 
   0%,
   100% {
-    border-color: rgba(212, 175, 55, 0.2);
+    border-color: rgba(52, 69, 58, 0.2);
   }
 
   50% {
-    border-color: rgba(212, 175, 55, 0.6);
+    border-color: rgba(52, 69, 58, 0.6);
   }
 }
 
@@ -523,9 +562,9 @@ body {
 .text-shimmer {
   background: linear-gradient(90deg,
       var(--accent-gold) 0%,
-      #f5e27a 40%,
+      #f0e6d0 40%,
       var(--accent-gold) 60%,
-      #b6902d 100%);
+      #a39175 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -599,9 +638,9 @@ main>section+section::before {
   height: 1px;
   background: linear-gradient(90deg,
       transparent 0%,
-      rgba(212, 175, 55, 0.08) 20%,
-      rgba(212, 175, 55, 0.28) 50%,
-      rgba(212, 175, 55, 0.08) 80%,
+      rgba(52, 69, 58, 0.08) 20%,
+      rgba(52, 69, 58, 0.28) 50%,
+      rgba(52, 69, 58, 0.08) 80%,
       transparent 100%);
   margin: 0 auto;
   max-width: 800px;

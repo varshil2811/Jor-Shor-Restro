@@ -21,7 +21,7 @@
 
 .menu-tab-btn {
   background: transparent;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(52, 69, 58, 0.3);
   color: var(--text-muted);
   padding: 0.45rem 1.25rem;
   border-radius: 30px;
@@ -37,10 +37,10 @@
 }
 
 .menu-tab-btn.active {
-  background-color: rgba(212, 175, 55, 0.14);
+  background-color: rgba(52, 69, 58, 0.14);
   border-color: var(--accent-gold);
   color: var(--accent-gold);
-  box-shadow: 0 0 14px rgba(212, 175, 55, 0.18);
+  box-shadow: 0 0 14px rgba(52, 69, 58, 0.18);
 }
 
 /* ── grid ── */
@@ -66,8 +66,8 @@
   background-color: var(--bg-white);
   border-radius: 20px;
   padding: 0;
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(52, 69, 58, 0.22);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(52, 69, 58, 0.06);
   position: relative;
   overflow: hidden;
   /* animation transition */
@@ -78,8 +78,8 @@
 
 .menu-item-card:hover {
   transform: translateY(-6px) scale(1.012);
-  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.6), 0 0 24px rgba(212, 175, 55, 0.16);
-  border-color: rgba(212, 175, 55, 0.42);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.6), 0 0 24px rgba(52, 69, 58, 0.16);
+  border-color: rgba(52, 69, 58, 0.42);
 }
 
 /* ── image ── */
@@ -117,7 +117,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #221b16 0%, #1a1512 100%);
+  background: linear-gradient(135deg, #3e493d 0%, #2f3d35 100%);
 }
 
 .placeholder-text {
@@ -211,15 +211,15 @@
 }
 
 .price-pill {
-  background: linear-gradient(135deg, #d4af37 0%, #ae8925 100%);
-  color: #1a130e;
+  background: linear-gradient(135deg, #b4a081 0%, #9e8c70 100%);
+  color: #2f3d35;
   padding: 5px 28px;
   border-radius: 40px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   gap: 3px;
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 12px rgba(52, 69, 58, 0.3);
 }
 
 .price-currency {
