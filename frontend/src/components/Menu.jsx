@@ -16,6 +16,7 @@ const Menu = () => {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [showAllItems, setShowAllItems] = useState(false);
   const [headerRef, headerVisible] = useInView();
+  const [gridRef, gridVisible] = useInView();
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -196,7 +197,7 @@ const Menu = () => {
               ))}
             </div>
 
-            <div className="menu-grid menu-grid-enter">
+            <div className={`menu-grid stagger ${gridVisible ? 'visible' : ''}`} ref={gridRef}>
               {currentCategoryData?.items
                 .slice(0, showAllItems ? currentCategoryData.items.length : 3)
                 .map((item) => {

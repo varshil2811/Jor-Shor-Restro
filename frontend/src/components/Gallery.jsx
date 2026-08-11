@@ -12,6 +12,7 @@ const Gallery = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
   const [headerRef, headerVisible] = useInView();
+  const [gridRef, gridVisible] = useInView();
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -72,7 +73,7 @@ const Gallery = () => {
             <p>No images in gallery yet.</p>
           </div>
         ) : (
-          <div className="gallery-grid gallery-grid-enter">
+          <div className={`gallery-grid stagger ${gridVisible ? 'visible' : ''}`} ref={gridRef}>
             {displayImages.map((img, index) => {
               const isLastAndMore = !showAll && index === maxImages - 1 && hasMore;
               const remainingCount = galleryImages.length - maxImages;
