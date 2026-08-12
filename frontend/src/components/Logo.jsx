@@ -1,7 +1,7 @@
 const Logo = ({ className = '' }) => {
   return (
     <img
-      src="/images/jor-shor-logo.png"
+      src="/images/final logo.png"
       alt="Jor Shor Logo"
       className={`brand-logo ${className}`.trim()}
       style={{ objectFit: 'contain' }}

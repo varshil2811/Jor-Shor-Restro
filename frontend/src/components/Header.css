@@ -56,32 +56,32 @@
 }
 
 .logo .brand-logo {
-  height: 72px;
+  height: 80px;
   width: auto;
   display: block;
 }
 
 .header.scrolled .logo .brand-logo {
-  height: 62px;
+  height: 65px;
 }
 
 @media (max-width: 992px) {
   .logo .brand-logo {
-    height: 58px;
+    height: 80px;
   }
 
   .header.scrolled .logo .brand-logo {
-    height: 50px;
+    height: 64px;
   }
 }
 
 @media (max-width: 576px) {
   .logo .brand-logo {
-    height: 44px;
+    height: 64px;
   }
 
   .header.scrolled .logo .brand-logo {
-    height: 40px;
+    height: 52px;
   }
 }
 
@@ -115,7 +115,7 @@
     gap: 0.5rem;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
   }
-  
+
   .header.scrolled .desktop-nav ul.nav-pill {
     background: rgba(47, 61, 53, 0.6);
     border-color: rgba(180, 160, 129, 0.2);
@@ -170,7 +170,7 @@
 
 .header:not(.scrolled) .desktop-nav a {
   color: var(--text-light);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .header:not(.scrolled) .mobile-menu-btn {
@@ -339,17 +339,35 @@
   .desktop-nav ul li {
     opacity: 0;
     transform: translateY(-10px);
-    animation: fadeDown 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+    animation: fadeDown 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
-  .desktop-nav ul li:nth-child(1) { animation-delay: 0.05s; }
-  .desktop-nav ul li:nth-child(2) { animation-delay: 0.10s; }
-  .desktop-nav ul li:nth-child(3) { animation-delay: 0.15s; }
-  .desktop-nav ul li:nth-child(4) { animation-delay: 0.20s; }
-  .desktop-nav ul li:nth-child(5) { animation-delay: 0.25s; }
-  .desktop-nav ul li:nth-child(6) { animation-delay: 0.30s; }
+
+  .desktop-nav ul li:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  .desktop-nav ul li:nth-child(2) {
+    animation-delay: 0.10s;
+  }
+
+  .desktop-nav ul li:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+
+  .desktop-nav ul li:nth-child(4) {
+    animation-delay: 0.20s;
+  }
+
+  .desktop-nav ul li:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+
+  .desktop-nav ul li:nth-child(6) {
+    animation-delay: 0.30s;
+  }
 }
 
 /* ── CTA button entrance ── */
 .nav-cta-btn {
-  animation: fadeDown 0.5s 0.4s cubic-bezier(0.22,1,0.36,1) both;
+  animation: fadeDown 0.5s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
