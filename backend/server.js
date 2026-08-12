@@ -11,8 +11,10 @@ import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import { v2 as cloudinary } from 'cloudinary';
 
+import Category from './models/Category.js';
 import MenuItem from './models/MenuItem.js';
 import GalleryImage from './models/GalleryImage.js';
+import GalleryReel from './models/GalleryReel.js';
 import Reservation from './models/Reservation.js';
 import Review from './models/Review.js';
 
@@ -52,10 +54,10 @@ cloudinary.config({
 });
 
 // Helper function to upload buffer to Cloudinary
-const uploadToCloudinary = (buffer, folder) => {
+const uploadToCloudinary = (buffer, folder, resourceType = 'auto') => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: folder },
+      { folder: folder, resource_type: resourceType },
       (error, result) => {
         if (error) return reject(error);
         resolve(result);
@@ -77,7 +79,33 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database Connection
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
+  .then(async () => {
+    console.log('Connected to MongoDB');
+    
+    // Auto-seed Categories from existing MenuItems if empty
+    try {
+      const categoryCount = await Category.countDocuments();
+      if (categoryCount === 0) {
+        const items = await MenuItem.find();
+        const uniqueCategories = [...new Set(items.map(i => i.category))];
+        if (uniqueCategories.length > 0) {
+          for (const catName of uniqueCategories) {
+            await new Category({ name: catName }).save();
+          }
+          console.log(`Seeded ${uniqueCategories.length} categories from existing items.`);
+        } else {
+          // If no items at all, seed default
+          const defaultCats = ['SOUP', 'APPETIZER', 'MAIN COURSE', 'DESSERT', 'BEVERAGES'];
+          for (const catName of defaultCats) {
+            await new Category({ name: catName }).save();
+          }
+          console.log(`Seeded default categories.`);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to seed categories:', err);
+    }
+  })
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // --- Authentication Middleware ---
@@ -110,9 +138,10 @@ app.post('/api/admin/login', (req, res) => {
 
 // --- Menu Routes ---
 
-// Get all menu items
+// Get all menu items mapped by defined Categories
 app.get('/api/menu', async (req, res) => {
   try {
+    const categories = await Category.find().sort({ createdAt: 1 });
     const items = await MenuItem.find().sort({ createdAt: -1 });
     
     // Group items by category to match the frontend structure easily
@@ -133,22 +162,50 @@ app.get('/api/menu', async (req, res) => {
       return acc;
     }, {});
 
-    // Convert object to array format that frontend expects
-    const formattedData = Object.keys(groupedData).map(category => ({
-      category,
-      items: groupedData[category]
+    // Ensure all defined categories exist in output, even if empty
+    const formattedData = categories.map(cat => ({
+      id: cat._id,
+      category: cat.name,
+      items: groupedData[cat.name] || []
     }));
 
-    if (formattedData.length === 0) {
-       return res.json([
-         { category: 'SOUP', items: [] },
-         { category: 'APPETIZER', items: [] },
-         { category: 'CHAAT', items: [] },
-         { category: 'BEVERAGES', items: [] }
-       ]);
-    }
-
     res.json(formattedData);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Categories Routes ---
+
+// Get all categories
+app.get('/api/categories', async (req, res) => {
+  try {
+    const categories = await Category.find().sort({ createdAt: 1 });
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create new category
+app.post('/api/categories', authMiddleware, async (req, res) => {
+  try {
+    if (!req.body.name) return res.status(400).json({ error: 'Category name required' });
+    const newCategory = new Category({ name: req.body.name });
+    const saved = await newCategory.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ error: 'Category already exists' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete category
+app.delete('/api/categories/:id', authMiddleware, async (req, res) => {
+  try {
+    const category = await Category.findByIdAndDelete(req.params.id);
+    if (!category) return res.status(404).json({ error: 'Category not found' });
+    res.json({ message: 'Category deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -285,6 +342,65 @@ app.delete('/api/gallery/:id', authMiddleware, async (req, res) => {
     }
     
     res.json({ message: 'Image deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Reels Routes ---
+
+// Get all reels
+app.get('/api/reels', async (req, res) => {
+  try {
+    const reels = await GalleryReel.find().sort({ createdAt: -1 });
+    const formattedReels = reels.map(r => ({
+      id: r._id,
+      title: r.title,
+      url: r.videoUrl
+    }));
+    res.json(formattedReels);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Upload a new reel
+app.post('/api/reels', authMiddleware, upload.single('video'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No video uploaded' });
+    }
+    
+    const result = await uploadToCloudinary(req.file.buffer, 'jorshor/reels', 'video');
+    
+    const newReel = new GalleryReel({
+      title: req.body.title || '',
+      videoUrl: result.secure_url,
+      publicId: result.public_id
+    });
+    const savedReel = await newReel.save();
+    
+    res.status(201).json({
+      id: savedReel._id,
+      title: savedReel.title,
+      url: savedReel.videoUrl
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Delete a reel
+app.delete('/api/reels/:id', authMiddleware, async (req, res) => {
+  try {
+    const deletedReel = await GalleryReel.findByIdAndDelete(req.params.id);
+    if (!deletedReel) return res.status(404).json({ error: 'Reel not found' });
+    
+    if (deletedReel.publicId) {
+      await cloudinary.uploader.destroy(deletedReel.publicId, { resource_type: 'video' });
+    }
+    
+    res.json({ message: 'Reel deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

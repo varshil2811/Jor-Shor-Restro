@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import './Gallery.css';
-import { X, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Loader, Play } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Gallery = () => {
   const [galleryImages, setGalleryImages] = useState([]);
+  const [reels, setReels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeView, setActiveView] = useState('photos'); // 'photos' or 'videos'
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
@@ -17,9 +19,14 @@ const Gallery = () => {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const res = await fetch(`${API_URL}/gallery`);
-        const data = await res.json();
-        setGalleryImages(data);
+        const [galleryRes, reelsRes] = await Promise.all([
+          fetch(`${API_URL}/gallery`),
+          fetch(`${API_URL}/reels`)
+        ]);
+        const galleryData = await galleryRes.json();
+        const reelsData = await reelsRes.json();
+        setGalleryImages(galleryData);
+        setReels(reelsData);
       } catch (err) {
         console.error('Failed to fetch gallery:', err);
       } finally {
@@ -61,6 +68,21 @@ const Gallery = () => {
         <div className={`text-center reveal ${headerVisible ? 'visible' : ''}`} ref={headerRef}>
           <h2 className="section-title">Gallery</h2>
           <p className="menu-subtitle">A glimpse of our world</p>
+          
+          <div className="gallery-toggle">
+            <button 
+              className={`toggle-btn ${activeView === 'photos' ? 'active' : ''}`}
+              onClick={() => setActiveView('photos')}
+            >
+              Photos
+            </button>
+            <button 
+              className={`toggle-btn ${activeView === 'videos' ? 'active' : ''}`}
+              onClick={() => setActiveView('videos')}
+            >
+              Videos
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -68,43 +90,78 @@ const Gallery = () => {
             <Loader className="animate-spin" size={32} color="#b4a081" />
             <p className="mt-2">Loading gallery...</p>
           </div>
-        ) : galleryImages.length === 0 ? (
-          <div className="text-center py-5" style={{ color: '#666' }}>
-            <p>No images in gallery yet.</p>
-          </div>
         ) : (
-          <div className={`gallery-grid stagger ${gridVisible ? 'visible' : ''}`} ref={gridRef}>
-            {displayImages.map((img, index) => {
-              const isLastAndMore = !showAll && index === maxImages - 1 && hasMore;
-              const remainingCount = galleryImages.length - maxImages;
+          <>
+            {activeView === 'videos' && (
+              <div className="reels-section">
+                {reels.length === 0 ? (
+                  <div className="text-center py-5" style={{ color: '#666' }}>
+                    <p>No videos in gallery yet.</p>
+                  </div>
+                ) : (
+                  <div className="reels-scroll-container">
+                    {reels.map(reel => (
+                      <div key={reel.id} className="reel-card">
+                        <video 
+                          src={reel.url} 
+                          className="reel-video"
+                          controls 
+                          muted 
+                          loop 
+                          playsInline 
+                          preload="metadata"
+                        />
+                        {reel.title && <div className="reel-caption">{reel.title}</div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
-              return (
-                <div
-                  key={img.id}
-                  className="gallery-item"
-                  onClick={() => isLastAndMore ? setShowAll(true) : openLightbox(index)}
-                >
-                  <img
-                    src={img.url}
-                    alt="Gallery"
-                    className="img-fade"
-                    onLoad={e => e.currentTarget.classList.add('loaded')}
-                  />
+            {activeView === 'photos' && (
+              <>
+                {galleryImages.length === 0 ? (
+                  <div className="text-center py-5" style={{ color: '#666' }}>
+                    <p>No images in gallery yet.</p>
+                  </div>
+                ) : (
+                  <div className={`gallery-grid stagger ${gridVisible ? 'visible' : ''}`} ref={gridRef}>
+                    {displayImages.map((img, index) => {
+                      const isLastAndMore = !showAll && index === maxImages - 1 && hasMore;
+                      const remainingCount = galleryImages.length - maxImages;
 
-                  {isLastAndMore ? (
-                    <div className="gallery-more-overlay">
-                      <span className="more-count">+{remainingCount}</span>
-                      <span className="more-label">View More</span>
-                    </div>
-                  ) : (
-                    <div className="gallery-overlay">
-                      <span>View</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                      return (
+                        <div
+                          key={img.id}
+                          className="gallery-item"
+                          onClick={() => isLastAndMore ? setShowAll(true) : openLightbox(index)}
+                        >
+                          <img
+                            src={img.url}
+                            alt="Gallery"
+                            className="img-fade"
+                            onLoad={e => e.currentTarget.classList.add('loaded')}
+                          />
+
+                          {isLastAndMore ? (
+                            <div className="gallery-more-overlay">
+                              <span className="more-count">+{remainingCount}</span>
+                              <span className="more-label">View More</span>
+                            </div>
+                          ) : (
+                            <div className="gallery-overlay">
+                              <span>View</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </>
         )}
       </div>
 

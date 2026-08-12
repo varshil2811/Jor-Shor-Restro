@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const DESC_MAX_LENGTH = 70;
 
 const Menu = () => {
-  const [activeCategory, setActiveCategory] = useState('Starters');
+  const [activeCategory, setActiveCategory] = useState('ALL');
   const [menuData, setMenuData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -24,8 +24,8 @@ const Menu = () => {
         const res = await fetch(`${API_URL}/menu`);
         const data = await res.json();
         setMenuData(data);
-        if (data.length > 0) {
-          setActiveCategory(data[0].category);
+        if (data.length > 0 && activeCategory === 'Starters') {
+          setActiveCategory('ALL');
         }
         setLoading(false);
       } catch (err) {
@@ -37,7 +37,9 @@ const Menu = () => {
     fetchMenu();
   }, []);
 
-  const currentCategoryData = menuData.find(c => c.category === activeCategory);
+  const currentCategoryData = activeCategory === 'ALL' 
+    ? { category: 'ALL', items: menuData.flatMap(c => c.items) }
+    : menuData.find(c => c.category === activeCategory);
 
   const downloadPDF = async () => {
     if (menuData.length === 0) return;
@@ -185,6 +187,15 @@ const Menu = () => {
         ) : (
           <>
             <div className="menu-tabs menu-tabs-enter">
+              <button
+                className={`menu-tab-btn ${activeCategory === 'ALL' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveCategory('ALL');
+                  setShowAllItems(false);
+                }}
+              >
+                ALL
+              </button>
               {menuData.map((cat) => (
                 <button
                   key={cat.category}
@@ -199,7 +210,7 @@ const Menu = () => {
               ))}
             </div>
 
-            <div className={`menu-grid stagger ${gridVisible ? 'visible' : ''}`} ref={gridRef}>
+            <div key={activeCategory} className={`menu-grid stagger ${gridVisible ? 'visible' : ''}`} ref={gridRef}>
               {currentCategoryData?.items
                 .slice(0, showAllItems ? currentCategoryData.items.length : 3)
                 .map((item) => {
@@ -266,6 +277,12 @@ const Menu = () => {
                   );
                 })}
             </div>
+
+            {currentCategoryData?.items && currentCategoryData.items.length === 0 && (
+              <div className="text-center" style={{ color: '#666', marginTop: '2rem' }}>
+                <p>No items added to this category yet.</p>
+              </div>
+            )}
 
             {currentCategoryData?.items && currentCategoryData.items.length > 3 && (
               <div className="text-center" style={{ marginTop: '2.5rem' }}>
