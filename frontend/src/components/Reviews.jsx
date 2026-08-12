@@ -65,31 +65,31 @@ const Reviews = () => {
     text: '',
     rating: 5
   });
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
-    const savedReviews = localStorage.getItem('jor-shor-reviews');
-    if (savedReviews) {
+    const fetchReviews = async () => {
       try {
-        const parsed = JSON.parse(savedReviews);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setReviews(parsed);
+        const res = await fetch(`${API_URL}/reviews`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setReviews(data);
+          }
         }
       } catch (error) {
-        console.error('Failed to parse saved reviews:', error);
+        console.error('Failed to fetch reviews:', error);
       }
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('jor-shor-reviews', JSON.stringify(reviews));
-  }, [reviews]);
+    };
+    fetchReviews();
+  }, [API_URL]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const trimmedName = formData.name.trim();
@@ -97,16 +97,30 @@ const Reviews = () => {
     if (!trimmedName || !trimmedText) return;
 
     const newReview = {
-      id: Date.now(),
       name: trimmedName,
       role: 'Customers',
       rating: formData.rating,
       text: trimmedText
     };
 
-    setReviews((prev) => [newReview, ...prev].slice(0, 8));
-    setFormData({ name: '', text: '', rating: 5 });
-    setIsModalOpen(false);
+    try {
+      const res = await fetch(`${API_URL}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newReview)
+      });
+      
+      if (res.ok) {
+        const savedReview = await res.json();
+        setReviews((prev) => [savedReview, ...prev]);
+        setFormData({ name: '', text: '', rating: 5 });
+        setIsModalOpen(false);
+      } else {
+        console.error('Failed to submit review');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    }
   };
 
   const renderRatingPicker = () =>
@@ -150,7 +164,7 @@ const Reviews = () => {
                   <div className="reviewer-avatar">{review.name.charAt(0)}</div>
                   <div>
                     <h4 className="reviewer-name">{review.name}</h4>
-                    <span className="review-role">{review.role}</span>
+                    <span className="review-role">{review.role || 'Customer'}</span>
                   </div>
                 </div>
                 <div className="review-rating-pill">
