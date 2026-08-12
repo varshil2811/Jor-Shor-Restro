@@ -103,11 +103,16 @@ const ReservationContact = () => {
                 </div>
                 <div className="form-group">
                   <label htmlFor="guests">Guests *</label>
-                  <select id="guests" name="guests" value={formData.guests} onChange={handleChange}>
-                    {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                      <option key={n} value={n}>{n} {n === 1 ? 'Person' : 'People'}</option>
-                    ))}
-                  </select>
+                  <input 
+                    type="number" 
+                    id="guests" 
+                    name="guests" 
+                    min="1"
+                    placeholder="Enter number of guests"
+                    required 
+                    value={formData.guests} 
+                    onChange={handleChange} 
+                  />
                 </div>
               </div>
 
