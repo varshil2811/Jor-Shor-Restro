@@ -29,6 +29,10 @@ const menuItemSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
     default: null
+  },
+  publicId: {
+    type: String,
+    default: null
   }
 }, { timestamps: true });
 

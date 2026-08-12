@@ -141,7 +141,7 @@ const AdminPanel = () => {
     setEditingId(item._id);
     setForm({ category: item.category, name: item.name, desc: item.desc,
               price: item.price, type: item.type, spice: item.spice });
-    setImgPreview(item.imageUrl ? `http://localhost:5000/uploads/${item.imageUrl}` : null);
+    setImgPreview(item.imageUrl ? (item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:5000/uploads/${item.imageUrl}`) : null);
     setImgFile(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -495,7 +495,7 @@ const AdminPanel = () => {
                             <div className="ap-item-cell">
                               <div className="ap-item-thumb">
                                 {item.imageUrl
-                                  ? <img src={`http://localhost:5000/uploads/${item.imageUrl}`} alt={item.name} />
+                                  ? <img src={item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:5000/uploads/${item.imageUrl}`} alt={item.name} />
                                   : <ImageIcon size={18} />}
                               </div>
                               <div>

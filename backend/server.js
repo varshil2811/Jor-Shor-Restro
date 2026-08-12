@@ -9,6 +9,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
+import { v2 as cloudinary } from 'cloudinary';
 
 import MenuItem from './models/MenuItem.js';
 import GalleryImage from './models/GalleryImage.js';
@@ -43,15 +44,29 @@ transporter.verify().then(() => {
   console.log('SMTP connection established successfully');
 }).catch(console.error);
 
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '-'));
-  }
+// Cloudinary Configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+// Helper function to upload buffer to Cloudinary
+const uploadToCloudinary = (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: folder },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
+
+// Multer Storage Configuration
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Middleware
@@ -113,7 +128,7 @@ app.get('/api/menu', async (req, res) => {
         price: item.price,
         type: item.type,
         spice: item.spice,
-        imageUrl: item.imageUrl ? `http://localhost:${PORT}/uploads/${item.imageUrl}` : null
+        imageUrl: item.imageUrl ? (item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:${PORT}/uploads/${item.imageUrl}`) : null
       });
       return acc;
     }, {});
@@ -154,7 +169,9 @@ app.post('/api/menu', authMiddleware, upload.single('image'), async (req, res) =
   try {
     const itemData = { ...req.body };
     if (req.file) {
-      itemData.imageUrl = req.file.filename;
+      const result = await uploadToCloudinary(req.file.buffer, 'jorshor/menu');
+      itemData.imageUrl = result.secure_url;
+      itemData.publicId = result.public_id;
     }
     const newItem = new MenuItem(itemData);
     const savedItem = await newItem.save();
@@ -168,15 +185,23 @@ app.post('/api/menu', authMiddleware, upload.single('image'), async (req, res) =
 app.put('/api/menu/:id', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     const itemData = { ...req.body };
+    const currentItem = await MenuItem.findById(req.params.id);
+    if (!currentItem) return res.status(404).json({ error: 'Item not found' });
+
     if (req.file) {
-      itemData.imageUrl = req.file.filename;
+      const result = await uploadToCloudinary(req.file.buffer, 'jorshor/menu');
+      itemData.imageUrl = result.secure_url;
+      itemData.publicId = result.public_id;
+      
+      if (currentItem.publicId) {
+        await cloudinary.uploader.destroy(currentItem.publicId);
+      }
     }
     const updatedItem = await MenuItem.findByIdAndUpdate(
       req.params.id,
       itemData,
       { new: true, runValidators: true }
     );
-    if (!updatedItem) return res.status(404).json({ error: 'Item not found' });
     res.json(updatedItem);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -189,8 +214,9 @@ app.delete('/api/menu/:id', authMiddleware, async (req, res) => {
     const deletedItem = await MenuItem.findByIdAndDelete(req.params.id);
     if (!deletedItem) return res.status(404).json({ error: 'Item not found' });
     
-    // Optionally delete the image file if it exists
-    if (deletedItem.imageUrl) {
+    if (deletedItem.publicId) {
+      await cloudinary.uploader.destroy(deletedItem.publicId);
+    } else if (deletedItem.imageUrl && !deletedItem.imageUrl.startsWith('http')) {
       const filePath = path.join(__dirname, 'uploads', deletedItem.imageUrl);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
@@ -211,7 +237,7 @@ app.get('/api/gallery', async (req, res) => {
     const images = await GalleryImage.find().sort({ createdAt: -1 });
     const formattedImages = images.map(img => ({
       id: img._id,
-      url: `http://localhost:${PORT}/uploads/${img.imageUrl}`
+      url: img.imageUrl.startsWith('http') ? img.imageUrl : `http://localhost:${PORT}/uploads/${img.imageUrl}`
     }));
     res.json(formattedImages);
   } catch (err) {
@@ -226,12 +252,17 @@ app.post('/api/gallery', authMiddleware, upload.single('image'), async (req, res
       return res.status(400).json({ error: 'No image uploaded' });
     }
     
-    const newImage = new GalleryImage({ imageUrl: req.file.filename });
+    const result = await uploadToCloudinary(req.file.buffer, 'jorshor/gallery');
+    
+    const newImage = new GalleryImage({ 
+      imageUrl: result.secure_url,
+      publicId: result.public_id
+    });
     const savedImage = await newImage.save();
     
     res.status(201).json({
       id: savedImage._id,
-      url: `http://localhost:${PORT}/uploads/${savedImage.imageUrl}`
+      url: savedImage.imageUrl
     });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -244,9 +275,13 @@ app.delete('/api/gallery/:id', authMiddleware, async (req, res) => {
     const deletedImage = await GalleryImage.findByIdAndDelete(req.params.id);
     if (!deletedImage) return res.status(404).json({ error: 'Image not found' });
     
-    const filePath = path.join(__dirname, 'uploads', deletedImage.imageUrl);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    if (deletedImage.publicId) {
+      await cloudinary.uploader.destroy(deletedImage.publicId);
+    } else if (deletedImage.imageUrl && !deletedImage.imageUrl.startsWith('http')) {
+      const filePath = path.join(__dirname, 'uploads', deletedImage.imageUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
     
     res.json({ message: 'Image deleted successfully' });
