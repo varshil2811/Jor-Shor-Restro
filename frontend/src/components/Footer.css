@@ -141,7 +141,7 @@
 
   .footer-bottom {
     font-size: 0.82rem;
-    padding: 1.25rem 0;
+    padding: 1.25rem 0 6rem 0;
   }
 }
 
@@ -187,4 +187,10 @@
 .social-links a:hover {
   transform: translateY(-5px) scale(1.12);
   box-shadow: 0 8px 20px rgba(52, 69, 58,0.3);
+}
+
+@media (max-width: 991px) {
+  .footer-bottom {
+    padding-bottom: 6rem !important;
+  }
 }

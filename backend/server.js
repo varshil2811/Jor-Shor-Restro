@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
+import jwt from 'jsonwebtoken';
 
 import MenuItem from './models/MenuItem.js';
 import GalleryImage from './models/GalleryImage.js';
@@ -64,6 +65,34 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
+// --- Authentication Middleware ---
+const authMiddleware = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Access denied. No token provided.' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    req.admin = decoded;
+    next();
+  } catch (err) {
+    res.status(400).json({ error: 'Invalid token.' });
+  }
+};
+
+// --- Auth Routes ---
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  if (
+    username === process.env.ADMIN_USERNAME &&
+    password === process.env.ADMIN_PASSWORD
+  ) {
+    const token = jwt.sign({ username }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    res.json({ token });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
 // --- Menu Routes ---
 
 // Get all menu items
@@ -111,7 +140,7 @@ app.get('/api/menu', async (req, res) => {
 });
 
 // Get raw items for Admin panel table
-app.get('/api/admin/menu', async (req, res) => {
+app.get('/api/admin/menu', authMiddleware, async (req, res) => {
   try {
     const items = await MenuItem.find().sort({ createdAt: -1 });
     res.json(items);
@@ -121,7 +150,7 @@ app.get('/api/admin/menu', async (req, res) => {
 });
 
 // Add a new menu item
-app.post('/api/menu', upload.single('image'), async (req, res) => {
+app.post('/api/menu', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     const itemData = { ...req.body };
     if (req.file) {
@@ -136,7 +165,7 @@ app.post('/api/menu', upload.single('image'), async (req, res) => {
 });
 
 // Update a menu item
-app.put('/api/menu/:id', upload.single('image'), async (req, res) => {
+app.put('/api/menu/:id', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     const itemData = { ...req.body };
     if (req.file) {
@@ -155,7 +184,7 @@ app.put('/api/menu/:id', upload.single('image'), async (req, res) => {
 });
 
 // Delete a menu item
-app.delete('/api/menu/:id', async (req, res) => {
+app.delete('/api/menu/:id', authMiddleware, async (req, res) => {
   try {
     const deletedItem = await MenuItem.findByIdAndDelete(req.params.id);
     if (!deletedItem) return res.status(404).json({ error: 'Item not found' });
@@ -191,7 +220,7 @@ app.get('/api/gallery', async (req, res) => {
 });
 
 // Upload a new gallery image
-app.post('/api/gallery', upload.single('image'), async (req, res) => {
+app.post('/api/gallery', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image uploaded' });
@@ -210,7 +239,7 @@ app.post('/api/gallery', upload.single('image'), async (req, res) => {
 });
 
 // Delete a gallery image
-app.delete('/api/gallery/:id', async (req, res) => {
+app.delete('/api/gallery/:id', authMiddleware, async (req, res) => {
   try {
     const deletedImage = await GalleryImage.findByIdAndDelete(req.params.id);
     if (!deletedImage) return res.status(404).json({ error: 'Image not found' });
@@ -266,7 +295,7 @@ app.post('/api/reservations', async (req, res) => {
   }
 });
 
-app.get('/api/reservations', async (req, res) => {
+app.get('/api/reservations', authMiddleware, async (req, res) => {
   try {
     const reservations = await Reservation.find().sort({ createdAt: -1 });
     res.json(reservations);
@@ -275,7 +304,7 @@ app.get('/api/reservations', async (req, res) => {
   }
 });
 
-app.put('/api/reservations/:id', async (req, res) => {
+app.put('/api/reservations/:id', authMiddleware, async (req, res) => {
   try {
     const updatedReservation = await Reservation.findByIdAndUpdate(
       req.params.id,
@@ -319,7 +348,7 @@ app.put('/api/reservations/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/reservations/:id', async (req, res) => {
+app.delete('/api/reservations/:id', authMiddleware, async (req, res) => {
   try {
     const deletedReservation = await Reservation.findByIdAndDelete(req.params.id);
     if (!deletedReservation) return res.status(404).json({ error: 'Reservation not found' });
@@ -353,7 +382,7 @@ app.post('/api/reviews', async (req, res) => {
 });
 
 // Update review status
-app.put('/api/reviews/:id', async (req, res) => {
+app.put('/api/reviews/:id', authMiddleware, async (req, res) => {
   try {
     const updatedReview = await Review.findByIdAndUpdate(
       req.params.id,
@@ -368,7 +397,7 @@ app.put('/api/reviews/:id', async (req, res) => {
 });
 
 // Delete a review
-app.delete('/api/reviews/:id', async (req, res) => {
+app.delete('/api/reviews/:id', authMiddleware, async (req, res) => {
   try {
     const deletedReview = await Review.findByIdAndDelete(req.params.id);
     if (!deletedReview) return res.status(404).json({ error: 'Review not found' });

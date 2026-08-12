@@ -30,6 +30,10 @@ const StatCard = ({ icon, label, value, accent }) => (
 
 /* ─── main component ────────────────────────────── */
 const AdminPanel = () => {
+  const [token, setToken] = useState(localStorage.getItem('adminToken') || null);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState('');
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [menuItems, setMenuItems]     = useState([]);
@@ -53,8 +57,13 @@ const AdminPanel = () => {
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 4000); };
 
   /* ── fetchers ── */
+  const getAuthHeaders = () => {
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  };
+
   const fetchMenu = async () => {
-    const res = await fetch(`${API_URL}/admin/menu`);
+    if (!token) return;
+    const res = await fetch(`${API_URL}/admin/menu`, { headers: getAuthHeaders() });
     setMenuItems(await res.json());
   };
   const fetchGallery = async () => {
@@ -62,7 +71,8 @@ const AdminPanel = () => {
     setGallery(await res.json());
   };
   const fetchReservations = async (silent = false) => {
-    const res = await fetch(`${API_URL}/reservations`);
+    if (!token) return;
+    const res = await fetch(`${API_URL}/reservations`, { headers: getAuthHeaders() });
     const data = await res.json();
     const pending = data.filter(r => r.status === 'Pending').length;
     if (silent && prevPendingRef.current !== -1 && pending > prevPendingRef.current) {
@@ -77,13 +87,17 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     (async () => {
       await Promise.all([fetchMenu(), fetchGallery(), fetchReservations(), fetchReviews()]);
       setLoading(false);
     })();
     const id = setInterval(() => fetchReservations(true), 10000);
     return () => clearInterval(id);
-  }, []);
+  }, [token]);
 
   /* ── derived counts ── */
   const pendingRes  = reservations.filter(r => r.status === 'Pending').length;
@@ -116,7 +130,7 @@ const AdminPanel = () => {
       if (imgFile) fd.append('image', imgFile);
       const url  = editingId ? `${API_URL}/menu/${editingId}` : `${API_URL}/menu`;
       const meth = editingId ? 'PUT' : 'POST';
-      await fetch(url, { method: meth, body: fd });
+      await fetch(url, { method: meth, headers: getAuthHeaders(), body: fd });
       showToast(editingId ? '✅ Item updated!' : '✅ Item added!');
       resetForm(); fetchMenu();
     } catch { showToast('❌ Failed to save item'); }
@@ -134,7 +148,7 @@ const AdminPanel = () => {
 
   const handleDeleteMenu = async (id) => {
     if (!confirm('Delete this menu item?')) return;
-    await fetch(`${API_URL}/menu/${id}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/menu/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
     showToast('🗑️ Item deleted'); fetchMenu();
   };
 
@@ -152,7 +166,7 @@ const AdminPanel = () => {
     setUploading(true);
     try {
       const fd = new FormData(); fd.append('image', galleryFile);
-      await fetch(`${API_URL}/gallery`, { method: 'POST', body: fd });
+      await fetch(`${API_URL}/gallery`, { method: 'POST', headers: getAuthHeaders(), body: fd });
       showToast('✅ Image uploaded!');
       setGalleryFile(null); setGalleryPreview(null);
       const el = document.getElementById('gallery-upload');
@@ -164,14 +178,14 @@ const AdminPanel = () => {
 
   const handleDeleteGallery = async (id) => {
     if (!confirm('Delete this image?')) return;
-    await fetch(`${API_URL}/gallery/${id}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/gallery/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
     showToast('🗑️ Image deleted'); fetchGallery();
   };
 
   /* ── reservation handlers ── */
   const handleConfirmRes = async (id) => {
     await fetch(`${API_URL}/reservations/${id}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      method: 'PUT', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'Confirmed' })
     });
     showToast('✅ Reservation confirmed & email sent!');
@@ -180,7 +194,7 @@ const AdminPanel = () => {
 
   const handleDeleteRes = async (id) => {
     if (!confirm('Delete this reservation?')) return;
-    await fetch(`${API_URL}/reservations/${id}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/reservations/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
     showToast('🗑️ Reservation deleted');
     setReservations(prev => prev.filter(r => r._id !== id));
   };
@@ -188,7 +202,7 @@ const AdminPanel = () => {
   /* ── review handlers ── */
   const handleApproveReview = async (id) => {
     await fetch(`${API_URL}/reviews/${id}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      method: 'PUT', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'Approved' })
     });
     showToast('✅ Review approved!');
@@ -197,7 +211,7 @@ const AdminPanel = () => {
 
   const handleDeleteReview = async (id) => {
     if (!confirm('Delete this review?')) return;
-    await fetch(`${API_URL}/reviews/${id}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/reviews/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
     showToast('🗑️ Review deleted');
     setReviews(prev => prev.filter(r => r._id !== id));
   };
@@ -211,6 +225,57 @@ const AdminPanel = () => {
   ];
 
   const navigate = (key) => { setActiveTab(key); setSidebarOpen(false); };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    try {
+      const res = await fetch(`${API_URL}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginForm)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setToken(data.token);
+        localStorage.setItem('adminToken', data.token);
+      } else {
+        setLoginError('Invalid username or password');
+      }
+    } catch {
+      setLoginError('Login failed. Server error.');
+    }
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    localStorage.removeItem('adminToken');
+  };
+
+  if (!token) {
+    return (
+      <div className="ap-root" style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <div className="ap-card" style={{ maxWidth: 400, width: '90%', padding: '2rem' }}>
+          <h2 style={{ color: 'var(--ap-text)', textAlign: 'center', marginBottom: '1.5rem' }}>Admin Login</h2>
+          {loginError && <div className="ap-sub" style={{ color: 'var(--ap-red)', textAlign: 'center', marginBottom: '1rem' }}>{loginError}</div>}
+          <form className="ap-form" onSubmit={handleLogin}>
+            <div className="ap-field">
+              <label>Username</label>
+              <input type="text" required value={loginForm.username} onChange={e => setLoginForm({...loginForm, username: e.target.value})} />
+            </div>
+            <div className="ap-field">
+              <label>Password</label>
+              <input type="password" required value={loginForm.password} onChange={e => setLoginForm({...loginForm, password: e.target.value})} />
+            </div>
+            <button type="submit" className="ap-btn ap-btn-primary" style={{ marginTop: '1rem' }}>Login</button>
+          </form>
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <Link to="/" className="ap-link">← Back to Main Site</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) return (
     <div className="ap-full-loader">
@@ -253,8 +318,11 @@ const AdminPanel = () => {
         </nav>
 
         <div className="ap-sidebar-footer">
+          <button className="ap-exit-btn" onClick={handleLogout} style={{ width: '100%', marginBottom: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+            <LogOut size={16} /> Logout Admin
+          </button>
           <Link to="/" className="ap-exit-btn">
-            <LogOut size={16} /> Exit to Site
+            <X size={16} /> Exit to Site
           </Link>
         </div>
       </aside>
