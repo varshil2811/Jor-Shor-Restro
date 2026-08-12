@@ -50,8 +50,8 @@
   margin-bottom: 1rem;
   padding: 1rem 2rem;
   background: rgba(47, 61, 53, 0.4);
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border: 1px solid rgba(180, 160, 129, 0.15);
   border-radius: 16px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
@@ -111,8 +111,8 @@
 ═══════════════════════════════════ */
 .reservation-form-container {
   background: rgba(47, 61, 53, 0.65);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border: 1px solid rgba(180, 160, 129, 0.25);
   border-radius: 20px;
   padding: 1.25rem;
@@ -267,8 +267,8 @@
 
 .contact-info-card {
   background: rgba(47, 61, 53, 0.65);
-  backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
   border: 1px solid rgba(180, 160, 129, 0.2);
   border-radius: 20px;
   padding: 1.25rem;
