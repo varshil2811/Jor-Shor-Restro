@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './Menu.css';
-import { Leaf, Flame, ArrowDownToLine, Loader } from 'lucide-react';
+import { Leaf, Flame, ArrowDownToLine, Loader, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useInView } from '../hooks/useInView';
@@ -12,7 +12,7 @@ const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('Starters');
   const [menuData, setMenuData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedDesc, setExpandedDesc] = useState({});
+  const [selectedItem, setSelectedItem] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [showAllItems, setShowAllItems] = useState(false);
   const [headerRef, headerVisible] = useInView();
@@ -145,12 +145,14 @@ const Menu = () => {
     }
   };
 
-  const toggleDesc = (id) => {
-    setExpandedDesc(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
+  useEffect(() => {
+    if (selectedItem) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [selectedItem]);
 
   return (
     <section id="menu" className="section menu-section">
@@ -201,75 +203,74 @@ const Menu = () => {
               {currentCategoryData?.items
                 .slice(0, showAllItems ? currentCategoryData.items.length : 3)
                 .map((item) => {
-                const isExpanded = expandedDesc[item._id];
-                const shouldTruncate = item.desc && item.desc.length > DESC_MAX_LENGTH;
-                const displayDesc = (shouldTruncate && !isExpanded)
-                  ? item.desc.substring(0, DESC_MAX_LENGTH) + '...'
-                  : item.desc;
+                  const shouldTruncate = item.desc && item.desc.length > DESC_MAX_LENGTH;
+                  const displayDesc = shouldTruncate
+                    ? item.desc.substring(0, DESC_MAX_LENGTH) + '...'
+                    : item.desc;
 
-                return (
-                  <div key={item._id} className="menu-item-card">
-                    {/* Image Section - Top */}
-                    <div className="menu-item-image-wrapper">
-                      {item.imageUrl ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="menu-item-image img-fade"
-                          onLoad={e => e.currentTarget.classList.add('loaded')}
-                        />
-                      ) : (
-                        <div className="menu-item-image-placeholder">
-                          <span className="placeholder-text">Jor Shor</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Content Section - Bottom */}
-                    <div className="menu-item-content">
-                      <div className="menu-item-header">
-                        <h3 className="menu-item-name">
-                          <span className="name-text">{item.name}</span>
-                          {item.type === 'veg' ? (
-                            <span className="type-icon veg" title="Vegetarian"><div className="dot"></div></span>
-                          ) : (
-                            <span className="type-icon non-veg" title="Non-Vegetarian"><div className="dot"></div></span>
-                          )}
-                        </h3>
-                        {item.spice > 0 && (
-                          <div className="spice-icons text-center">
-                            {[...Array(item.spice)].map((_, i) => (
-                              <Flame key={i} size={14} color="#ff4500" />
-                            ))}
+                  return (
+                    <div key={item._id} className="menu-item-card">
+                      {/* Image Section - Top */}
+                      <div className="menu-item-image-wrapper">
+                        {item.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="menu-item-image img-fade"
+                            onLoad={e => e.currentTarget.classList.add('loaded')}
+                          />
+                        ) : (
+                          <div className="menu-item-image-placeholder">
+                            <span className="placeholder-text">Jor Shor</span>
                           </div>
                         )}
                       </div>
 
-                      <p className="menu-item-desc">
-                        {displayDesc}
-                        {shouldTruncate && (
-                          <button className="btn-read-more" onClick={() => toggleDesc(item._id)}>
-                            {isExpanded ? 'show less' : 'show more'}
-                          </button>
-                        )}
-                      </p>
+                      {/* Content Section - Bottom */}
+                      <div className="menu-item-content">
+                        <div className="menu-item-header">
+                          <h3 className="menu-item-name">
+                            <span className="name-text">{item.name}</span>
+                            {item.type === 'veg' ? (
+                              <span className="type-icon veg" title="Vegetarian"><div className="dot"></div></span>
+                            ) : (
+                              <span className="type-icon non-veg" title="Non-Vegetarian"><div className="dot"></div></span>
+                            )}
+                          </h3>
+                          {item.spice > 0 && (
+                            <div className="spice-icons text-center">
+                              {[...Array(item.spice)].map((_, i) => (
+                                <Flame key={i} size={14} color="#ff4500" />
+                              ))}
+                            </div>
+                          )}
+                        </div>
 
-                      <div className="menu-item-footer">
-                        <div className="price-pill">
-                          <span className="price-currency">₹</span>
-                          <span className="price-amount">{String(item.price).replace(/[^0-9.]/g, '')}</span>
+                        <p className="menu-item-desc">
+                          {displayDesc}
+                          {shouldTruncate && (
+                            <button className="btn-read-more" onClick={() => setSelectedItem(item)}>
+                              show more
+                            </button>
+                          )}
+                        </p>
+
+                        <div className="menu-item-footer">
+                          <div className="price-pill">
+                            <span className="price-currency">₹</span>
+                            <span className="price-amount">{String(item.price).replace(/[^0-9.]/g, '')}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
 
             {currentCategoryData?.items && currentCategoryData.items.length > 3 && (
               <div className="text-center" style={{ marginTop: '2.5rem' }}>
-                <button 
-                  className="btn btn-primary" 
+                <button
+                  className="btn btn-primary"
                   style={{ padding: '0.6rem 2rem' }}
                   onClick={() => setShowAllItems(!showAllItems)}
                 >
@@ -281,6 +282,54 @@ const Menu = () => {
         )}
 
       </div>
+
+      {/* Modal */}
+      {selectedItem && (
+        <div className="menu-modal-overlay" onClick={() => setSelectedItem(null)}>
+          <div className="menu-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="menu-modal-close" onClick={() => setSelectedItem(null)}>
+              <X size={24} />
+            </button>
+            <div className="menu-modal-image-wrapper">
+              {selectedItem.imageUrl ? (
+                <img src={selectedItem.imageUrl} alt={selectedItem.name} className="menu-modal-image" />
+              ) : (
+                <div className="menu-item-image-placeholder">
+                  <span className="placeholder-text">Jor Shor</span>
+                </div>
+              )}
+            </div>
+            <div className="menu-modal-body">
+              <div className="menu-modal-header">
+                <h3 className="menu-modal-name">
+                  <span className="name-text">{selectedItem.name}</span>
+                  {selectedItem.type === 'veg' ? (
+                    <span className="type-icon veg" title="Vegetarian"><div className="dot"></div></span>
+                  ) : (
+                    <span className="type-icon non-veg" title="Non-Vegetarian"><div className="dot"></div></span>
+                  )}
+                </h3>
+                {selectedItem.spice > 0 && (
+                  <div className="menu-modal-spice">
+                    {[...Array(selectedItem.spice)].map((_, i) => (
+                      <Flame key={i} size={18} color="#ff4500" />
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="menu-modal-desc-container">
+                <p className="menu-modal-desc">{selectedItem.desc}</p>
+              </div>
+              <div className="menu-modal-footer">
+                <div className="price-pill modal-price">
+                  <span className="price-currency">₹</span>
+                  <span className="price-amount">{String(selectedItem.price).replace(/[^0-9.]/g, '')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
