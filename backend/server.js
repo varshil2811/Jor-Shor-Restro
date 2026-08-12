@@ -17,6 +17,7 @@ import GalleryImage from './models/GalleryImage.js';
 import GalleryReel from './models/GalleryReel.js';
 import Reservation from './models/Reservation.js';
 import Review from './models/Review.js';
+import Setting from './models/Setting.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -281,6 +282,40 @@ app.delete('/api/menu/:id', authMiddleware, async (req, res) => {
     }
     
     res.json({ message: 'Item deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Settings Routes ---
+
+// Get a setting by key
+app.get('/api/settings/:key', async (req, res) => {
+  try {
+    const setting = await Setting.findOne({ key: req.params.key });
+    if (!setting) return res.status(404).json({ error: 'Setting not found' });
+    res.json({ key: setting.key, value: setting.value });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Upload Menu PDF and save to setting
+app.post('/api/settings/menu-pdf', authMiddleware, upload.single('pdf'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'PDF file is required' });
+    
+    // Upload PDF to Cloudinary as raw file type
+    const result = await uploadToCloudinary(req.file.buffer, 'jorshor/settings', 'raw');
+    
+    // Update or create setting
+    const setting = await Setting.findOneAndUpdate(
+      { key: 'menu_pdf' },
+      { value: result.secure_url },
+      { upsert: true, new: true }
+    );
+    
+    res.json(setting);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

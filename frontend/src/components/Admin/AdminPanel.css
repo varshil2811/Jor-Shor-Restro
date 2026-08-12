@@ -607,6 +607,29 @@
   color: var(--ap-gold);
 }
 
+.ap-custom-file-input {
+  flex: 1;
+  color: var(--ap-text);
+  font-family: inherit;
+  font-size: 13.5px;
+}
+.ap-custom-file-input::file-selector-button {
+  background: var(--ap-card-border);
+  color: var(--ap-text);
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--ap-radius-sm);
+  cursor: pointer;
+  margin-right: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  transition: var(--ap-transition);
+}
+.ap-custom-file-input::file-selector-button:hover {
+  background: var(--ap-gold-dim);
+  color: var(--ap-gold);
+}
+
 .ap-file-label span {
   font-size: 13px;
 }

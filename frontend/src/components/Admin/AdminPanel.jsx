@@ -90,6 +90,11 @@ const AdminPanel = () => {
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
+  /* menu pdf state */
+  const [menuPdfFile, setMenuPdfFile] = useState(null);
+  const [menuPdfUrl, setMenuPdfUrl] = useState(null);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 4000);
@@ -140,6 +145,17 @@ const AdminPanel = () => {
     const res = await fetch(`${API_URL}/reviews`);
     setReviews(await res.json());
   };
+  const fetchMenuPdf = async () => {
+    try {
+      const res = await fetch(`${API_URL}/settings/menu_pdf`);
+      if (res.ok) {
+        const data = await res.json();
+        setMenuPdfUrl(data.value);
+      }
+    } catch (err) {
+      console.log('No menu PDF setting found');
+    }
+  };
 
   useEffect(() => {
     if (!token) {
@@ -154,6 +170,7 @@ const AdminPanel = () => {
         fetchReels(),
         fetchReservations(),
         fetchReviews(),
+        fetchMenuPdf(),
       ]);
       setLoading(false);
     })();
@@ -258,6 +275,32 @@ const AdminPanel = () => {
       fetchCategories();
     } catch (err) {
       alert(err.message);
+    }
+  };
+
+  const handleMenuPdfSubmit = async (e) => {
+    e.preventDefault();
+    if (!menuPdfFile) return;
+    setUploadingPdf(true);
+    try {
+      const fd = new FormData();
+      fd.append("pdf", menuPdfFile);
+      const res = await fetch(`${API_URL}/settings/menu-pdf`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: fd,
+      });
+      if (!res.ok) throw new Error("Failed to upload Menu PDF");
+      const data = await res.json();
+      setMenuPdfUrl(data.value);
+      setMenuPdfFile(null);
+      const el = document.getElementById("menu-pdf-upload");
+      if (el) el.value = "";
+      showToast("✅ Menu PDF uploaded successfully!");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setUploadingPdf(false);
     }
   };
 
@@ -756,6 +799,45 @@ const AdminPanel = () => {
                   gap: "1.5rem",
                 }}
               >
+                {/* menu pdf upload form */}
+                <div className="ap-card">
+                  <h3 className="ap-card-title">
+                    <Plus size={16} /> Manage Full PDF Menu
+                  </h3>
+                  <div style={{ marginBottom: '1rem', color: 'var(--ap-text-muted)', fontSize: '0.9rem' }}>
+                    Upload a custom PDF menu for visitors to download. If not uploaded, a PDF will be generated automatically.
+                  </div>
+                  {menuPdfUrl && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <strong>Current PDF:</strong> <a href={menuPdfUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--ap-gold)' }}>View Uploaded PDF</a>
+                    </div>
+                  )}
+                  <form
+                    onSubmit={handleMenuPdfSubmit}
+                    style={{
+                      display: "flex",
+                      gap: "0.75rem",
+                      alignItems: "center"
+                    }}
+                  >
+                    <input
+                      id="menu-pdf-upload"
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => setMenuPdfFile(e.target.files[0])}
+                      className="ap-custom-file-input"
+                    />
+                    <button 
+                      type="submit" 
+                      className="ap-btn ap-btn-primary" 
+                      disabled={!menuPdfFile || uploadingPdf}
+                      style={{ padding: "0.6rem 1.5rem", whiteSpace: "nowrap" }}
+                    >
+                      {uploadingPdf ? "Uploading..." : "Upload PDF"}
+                    </button>
+                  </form>
+                </div>
+
                 {/* manage categories form */}
                 <div className="ap-card">
                   <h3 className="ap-card-title">

@@ -14,6 +14,7 @@ const Menu = () => {
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [customPdfUrl, setCustomPdfUrl] = useState(null);
   const [showAllItems, setShowAllItems] = useState(false);
   const [headerRef, headerVisible] = useInView();
   const [gridRef, gridVisible] = useInView();
@@ -34,7 +35,20 @@ const Menu = () => {
       }
     };
 
+    const fetchMenuPdf = async () => {
+      try {
+        const res = await fetch(`${API_URL}/settings/menu_pdf`);
+        if (res.ok) {
+          const data = await res.json();
+          setCustomPdfUrl(data.value);
+        }
+      } catch (err) {
+        // silently fail if setting not found
+      }
+    };
+
     fetchMenu();
+    fetchMenuPdf();
   }, []);
 
   const currentCategoryData = activeCategory === 'ALL' 
@@ -42,6 +56,12 @@ const Menu = () => {
     : menuData.find(c => c.category === activeCategory);
 
   const downloadPDF = async () => {
+    if (customPdfUrl) {
+      // If a custom PDF is uploaded, download it directly
+      window.open(customPdfUrl, '_blank');
+      return;
+    }
+
     if (menuData.length === 0) return;
     setPdfLoading(true);
 
