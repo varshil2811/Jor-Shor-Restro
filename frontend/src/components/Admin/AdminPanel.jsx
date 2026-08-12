@@ -280,7 +280,10 @@ const AdminPanel = () => {
 
   const handleMenuPdfSubmit = async (e) => {
     e.preventDefault();
-    if (!menuPdfFile) return;
+    if (!menuPdfFile) {
+      showToast("⚠️ Please select a PDF file first");
+      return;
+    }
     setUploadingPdf(true);
     try {
       const fd = new FormData();
@@ -830,7 +833,7 @@ const AdminPanel = () => {
                     <button 
                       type="submit" 
                       className="ap-btn ap-btn-primary" 
-                      disabled={!menuPdfFile || uploadingPdf}
+                      disabled={uploadingPdf}
                       style={{ padding: "0.6rem 1.5rem", whiteSpace: "nowrap" }}
                     >
                       {uploadingPdf ? "Uploading..." : "Upload PDF"}

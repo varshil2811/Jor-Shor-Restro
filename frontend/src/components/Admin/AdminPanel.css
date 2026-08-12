@@ -609,25 +609,37 @@
 
 .ap-custom-file-input {
   flex: 1;
-  color: var(--ap-text);
+  padding: 0.35rem 0.35rem 0.35rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--ap-card-border);
+  background-color: rgba(255, 255, 255, 0.02);
+  color: var(--ap-text-muted);
   font-family: inherit;
   font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  transition: var(--ap-transition);
 }
+
+.ap-custom-file-input:hover {
+  border-color: var(--ap-gold);
+}
+
 .ap-custom-file-input::file-selector-button {
-  background: var(--ap-card-border);
+  background: rgba(255, 255, 255, 0.06);
   color: var(--ap-text);
-  border: none;
-  padding: 8px 16px;
-  border-radius: var(--ap-radius-sm);
+  border: 1px solid var(--ap-card-border);
+  padding: 6px 14px;
+  border-radius: 6px;
   cursor: pointer;
   margin-right: 12px;
   font-family: inherit;
   font-weight: 500;
   transition: var(--ap-transition);
 }
+
 .ap-custom-file-input::file-selector-button:hover {
-  background: var(--ap-gold-dim);
-  color: var(--ap-gold);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .ap-file-label span {
