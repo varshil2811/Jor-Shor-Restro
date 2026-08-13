@@ -503,6 +503,7 @@
 @media (min-width: 1201px) {
   .ap-two-col {
     height: calc(100vh - 120px);
+    gap: 44px; /* 20px visual gap + 12px right margin (left col) + 12px left margin (right col) */
   }
   
   .ap-two-col > div {
