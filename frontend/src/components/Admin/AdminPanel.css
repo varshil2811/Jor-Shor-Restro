@@ -509,6 +509,9 @@
     display: block !important;
     height: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px;
+    margin: -12px;
     /* Hide scrollbar for cleaner look */
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
