@@ -864,8 +864,8 @@ const AdminPanel = () => {
                         flex: 1, 
                         padding: "0.6rem 1rem",
                         borderRadius: "8px",
-                        border: "1px solid var(--ap-border)",
-                        backgroundColor: "var(--ap-bg-darker)",
+                        border: "1px solid var(--ap-input-border)",
+                        backgroundColor: "var(--ap-input-bg)",
                         color: "var(--ap-text)"
                       }}
                     />
