@@ -506,6 +506,7 @@
   }
   
   .ap-two-col > div {
+    display: block !important;
     height: 100%;
     overflow-y: auto;
     /* Hide scrollbar for cleaner look */
@@ -513,9 +514,12 @@
     scrollbar-width: none;  /* Firefox */
   }
 
-  /* Prevent flex children inside these columns from shrinking instead of scrolling */
-  .ap-two-col > div > * {
-    flex-shrink: 0;
+  .ap-two-col > div > .ap-card {
+    margin-bottom: 24px;
+  }
+
+  .ap-two-col > div > .ap-card:last-child {
+    margin-bottom: 0;
   }
 
   /* Hide scrollbar for Chrome, Safari and Opera */
