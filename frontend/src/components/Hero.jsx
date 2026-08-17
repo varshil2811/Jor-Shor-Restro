@@ -13,6 +13,7 @@ const Hero = () => {
 
   return (
     <section id="home" className="hero">
+      <div className="hero-bg" />
       <div className="hero-overlay" />
 
       {/* floating ambient orbs */}

@@ -2,17 +2,30 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-image: url('../assets/images/hero_bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
   color: var(--bg-white);
   padding-top: var(--header-height);
 }
 
+.hero-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('../assets/images/hero_bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: 0;
+  animation: kenBurnsHero 35s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+@keyframes kenBurnsHero {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
 /* iOS Safari fix — fixed attachment causes blank screen */
 @supports (-webkit-touch-callout: none) {
-  .hero {
+  .hero-bg {
     background-attachment: scroll;
   }
 }
@@ -99,15 +112,9 @@
 
 .highlights-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   padding: 1.5rem;
-}
-
-@media (min-width: 576px) {
-  .highlights-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (min-width: 992px) {
@@ -205,7 +212,6 @@
   }
 }
 
-/* --- Highlights Bar Mobile --- */
 @media (max-width: 768px) {
   .highlights-grid {
     padding: 1.25rem 1rem;
@@ -223,8 +229,18 @@
 
 @media (max-width: 480px) {
   .highlights-grid {
-    grid-template-columns: 1fr;
-    padding: 1rem 0.75rem;
+    padding: 1rem 0.5rem;
+    gap: 0.5rem;
+  }
+  .highlight-item {
+    gap: 0.5rem;
+  }
+  .highlight-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .cuisine-icon {
+    font-size: 1.2rem;
   }
 }
 

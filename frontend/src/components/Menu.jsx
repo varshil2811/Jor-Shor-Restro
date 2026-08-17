@@ -10,6 +10,7 @@ const DESC_MAX_LENGTH = 70;
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('ALL');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [menuData, setMenuData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -51,9 +52,24 @@ const Menu = () => {
     fetchMenuPdf();
   }, []);
 
-  const currentCategoryData = activeCategory === 'ALL' 
+  const handleCategorySwitch = (newCategory) => {
+    if (newCategory === activeCategory) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActiveCategory(newCategory);
+      setShowAllItems(false);
+      setIsTransitioning(false);
+    }, 300);
+  };
+
+  const currentCategoryData = activeCategory === 'ALL'
     ? { category: 'ALL', items: menuData.flatMap(c => c.items) }
     : menuData.find(c => c.category === activeCategory);
+
+  const displayedItemsCount = currentCategoryData?.items
+    ? (showAllItems ? currentCategoryData.items.length : Math.min(currentCategoryData.items.length, 3))
+    : 0;
+  const isFewItems = displayedItemsCount > 0 && displayedItemsCount < 3;
 
   const downloadPDF = async () => {
     if (customPdfUrl) {
@@ -209,10 +225,7 @@ const Menu = () => {
             <div className="menu-tabs menu-tabs-enter">
               <button
                 className={`menu-tab-btn ${activeCategory === 'ALL' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveCategory('ALL');
-                  setShowAllItems(false);
-                }}
+                onClick={() => handleCategorySwitch('ALL')}
               >
                 ALL
               </button>
@@ -220,101 +233,104 @@ const Menu = () => {
                 <button
                   key={cat.category}
                   className={`menu-tab-btn ${activeCategory === cat.category ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveCategory(cat.category);
-                    setShowAllItems(false);
-                  }}
+                  onClick={() => handleCategorySwitch(cat.category)}
                 >
                   {cat.category}
                 </button>
               ))}
             </div>
 
-            <div key={activeCategory} className={`menu-grid stagger ${gridVisible ? 'visible' : ''}`} ref={gridRef}>
-              {currentCategoryData?.items
-                .slice(0, showAllItems ? currentCategoryData.items.length : 3)
-                .map((item) => {
-                  const shouldTruncate = item.desc && item.desc.length > DESC_MAX_LENGTH;
-                  const displayDesc = shouldTruncate
-                    ? item.desc.substring(0, DESC_MAX_LENGTH) + '...'
-                    : item.desc;
+            <div className={`menu-transition-wrapper ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
+              <div key={activeCategory} className={`menu-grid stagger ${gridVisible && !isTransitioning ? 'visible' : ''} ${isFewItems ? 'menu-grid-few' : ''}`} ref={gridRef}>
+                {currentCategoryData?.items
+                  .slice(0, showAllItems ? currentCategoryData.items.length : 3)
+                  .map((item) => {
+                    const shouldTruncate = item.desc && item.desc.length > DESC_MAX_LENGTH;
+                    const displayDesc = shouldTruncate
+                      ? item.desc.substring(0, DESC_MAX_LENGTH) + '...'
+                      : item.desc;
 
-                  return (
-                    <div key={item._id} className="menu-item-card">
-                      {/* Image Section - Top */}
-                      <div className="menu-item-image-wrapper">
-                        {item.imageUrl ? (
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name}
-                            className="menu-item-image img-fade"
-                            onLoad={e => e.currentTarget.classList.add('loaded')}
-                          />
-                        ) : (
-                          <div className="menu-item-image-placeholder">
-                            <span className="placeholder-text">Jor Shor</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Content Section - Bottom */}
-                      <div className="menu-item-content">
-                        <div className="menu-item-header">
-                          <h3 className="menu-item-name">
-                            <span className="name-text">{item.name}</span>
-                            {item.type === 'veg' ? (
-                              <span className="type-icon veg" title="Vegetarian"><div className="dot"></div></span>
-                            ) : (
-                              <span className="type-icon non-veg" title="Non-Vegetarian"><div className="dot"></div></span>
-                            )}
-                          </h3>
-                          {item.spice > 0 && (
-                            <div className="spice-icons text-center">
-                              {[...Array(item.spice)].map((_, i) => (
-                                <Flame key={i} size={14} color="#ff4500" />
-                              ))}
+                    return (
+                      <div key={item._id} className="menu-item-card">
+                        {/* Image Section - Top */}
+                        <div className="menu-item-image-wrapper">
+                          {item.imageUrl ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="menu-item-image img-fade"
+                              onLoad={e => e.currentTarget.classList.add('loaded')}
+                            />
+                          ) : (
+                            <div className="menu-item-image-placeholder">
+                              <span className="placeholder-text">Jor Shor</span>
                             </div>
                           )}
                         </div>
 
-                        <p className="menu-item-desc">
-                          {displayDesc}
-                          {shouldTruncate && (
-                            <button className="btn-read-more" onClick={() => setSelectedItem(item)}>
-                              show more
-                            </button>
-                          )}
-                        </p>
+                        {/* Content Section - Bottom */}
+                        <div className="menu-item-content">
+                          <div className="menu-item-header">
+                            <h3 className="menu-item-name">
+                              <span className="name-text">{item.name}</span>
+                            </h3>
+                          </div>
 
-                        <div className="menu-item-footer">
-                          <div className="price-pill">
-                            <span className="price-currency">₹</span>
-                            <span className="price-amount">{String(item.price).replace(/[^0-9.]/g, '')}</span>
+                          <div className="menu-item-tags">
+                            {item.type === 'veg' ? (
+                              <span className="tag-pill tag-veg" title="Vegetarian"><div className="dot"></div>Veg</span>
+                            ) : (
+                              <span className="tag-pill tag-non-veg" title="Non-Vegetarian"><div className="dot"></div>Non-Veg</span>
+                            )}
+                            {item.spice > 0 && (
+                              <span className="tag-pill tag-spice">
+                                {[...Array(item.spice)].map((_, i) => (
+                                  <Flame key={i} size={11} color="#b4a081" style={{ marginRight: '1px' }} />
+                                ))}
+                                Spicy
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="menu-item-desc">
+                            {displayDesc}
+                            {shouldTruncate && (
+                              <button className="btn-read-more" onClick={() => setSelectedItem(item)}>
+                                show more
+                              </button>
+                            )}
+                          </p>
+
+                          <div className="menu-item-footer">
+                            <div className="menu-item-price-modern">
+                              <span className="price-currency">₹</span>
+                              <span className="price-amount">{String(item.price).replace(/[^0-9.]/g, '')}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+              </div>
+
+              {currentCategoryData?.items && currentCategoryData.items.length === 0 && (
+                <div className="text-center" style={{ color: '#666', marginTop: '2rem' }}>
+                  <p>No items added to this category yet.</p>
+                </div>
+              )}
+
+              {currentCategoryData?.items && currentCategoryData.items.length > 3 && (
+                <div className="text-center" style={{ marginTop: '2.5rem' }}>
+                  <button
+                    className="btn btn-primary"
+                    style={{ padding: '0.6rem 2rem' }}
+                    onClick={() => setShowAllItems(!showAllItems)}
+                  >
+                    {showAllItems ? 'View Less' : 'View More Items'}
+                  </button>
+                </div>
+              )}
             </div>
-
-            {currentCategoryData?.items && currentCategoryData.items.length === 0 && (
-              <div className="text-center" style={{ color: '#666', marginTop: '2rem' }}>
-                <p>No items added to this category yet.</p>
-              </div>
-            )}
-
-            {currentCategoryData?.items && currentCategoryData.items.length > 3 && (
-              <div className="text-center" style={{ marginTop: '2.5rem' }}>
-                <button
-                  className="btn btn-primary"
-                  style={{ padding: '0.6rem 2rem' }}
-                  onClick={() => setShowAllItems(!showAllItems)}
-                >
-                  {showAllItems ? 'View Less' : 'View More Items'}
-                </button>
-              </div>
-            )}
           </>
         )}
 
