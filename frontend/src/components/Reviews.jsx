@@ -109,7 +109,7 @@ const Reviews = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newReview)
       });
-      
+
       if (res.ok) {
         const savedReview = await res.json();
         setReviews((prev) => [savedReview, ...prev]);
@@ -143,7 +143,7 @@ const Reviews = () => {
   const hasMoreReviews = reviews.length > VISIBLE_REVIEWS;
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0, VISIBLE_REVIEWS);
   const [headerRef, headerVisible] = useInView();
-  const [stackRef,  stackVisible]  = useInView(0.05);
+  const [stackRef, stackVisible] = useInView(0.05);
 
   return (
     <section id="reviews" className="section reviews-section">
