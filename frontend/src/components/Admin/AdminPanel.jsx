@@ -87,6 +87,7 @@ const AdminPanel = () => {
   const [reelTitle, setReelTitle] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [fetchError, setFetchError] = useState("");
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
@@ -107,28 +108,44 @@ const AdminPanel = () => {
 
   const fetchMenu = async () => {
     if (!token) return;
-    const res = await fetch(`${API_URL}/admin/menu`, {
-      headers: getAuthHeaders(),
-    });
-    setMenuItems(await res.json());
+    try {
+      const res = await fetch(`${API_URL}/admin/menu`, {
+        headers: getAuthHeaders(),
+        cache: 'no-store'
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`HTTP error! status: ${res.status} - ${errText}`);
+      }
+      const data = await res.json();
+      setMenuItems(data);
+    } catch (err) {
+      console.error("fetchMenu failed:", err);
+      throw err;
+    }
   };
   const fetchCategories = async () => {
-    const res = await fetch(`${API_URL}/categories`);
+    const res = await fetch(`${API_URL}/categories`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     setCategories(await res.json());
   };
   const fetchGallery = async () => {
-    const res = await fetch(`${API_URL}/gallery`);
+    const res = await fetch(`${API_URL}/gallery`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     setGallery(await res.json());
   };
   const fetchReels = async () => {
-    const res = await fetch(`${API_URL}/reels`);
+    const res = await fetch(`${API_URL}/reels`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     setReels(await res.json());
   };
   const fetchReservations = async (silent = false) => {
     if (!token) return;
     const res = await fetch(`${API_URL}/reservations`, {
       headers: getAuthHeaders(),
+      cache: 'no-store'
     });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();
     const pending = data.filter((r) => r.status === "Pending").length;
     if (
@@ -142,12 +159,13 @@ const AdminPanel = () => {
     setReservations(data);
   };
   const fetchReviews = async () => {
-    const res = await fetch(`${API_URL}/reviews`);
+    const res = await fetch(`${API_URL}/reviews`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     setReviews(await res.json());
   };
   const fetchMenuPdf = async () => {
     try {
-      const res = await fetch(`${API_URL}/settings/menu_pdf`);
+      const res = await fetch(`${API_URL}/settings/menu_pdf`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setMenuPdfUrl(data.value);
@@ -163,16 +181,27 @@ const AdminPanel = () => {
       return;
     }
     (async () => {
-      await Promise.all([
-        fetchMenu(),
-        fetchCategories(),
-        fetchGallery(),
-        fetchReels(),
-        fetchReservations(),
-        fetchReviews(),
-        fetchMenuPdf(),
-      ]);
-      setLoading(false);
+      try {
+        setFetchError("");
+        await Promise.all([
+          fetchMenu(),
+          fetchCategories(),
+          fetchGallery(),
+          fetchReels(),
+          fetchReservations(),
+          fetchReviews(),
+          fetchMenuPdf(),
+        ]);
+      } catch (error) {
+        console.error("Error loading admin data:", error);
+        setFetchError(error.message || "Failed to load admin data");
+        if (error.message && error.message.includes("401")) {
+          setToken(null);
+          localStorage.removeItem("adminToken");
+        }
+      } finally {
+        setLoading(false);
+      }
     })();
     const id = setInterval(() => fetchReservations(true), 10000);
     return () => clearInterval(id);
@@ -217,6 +246,10 @@ const AdminPanel = () => {
 
   const handleMenuSubmit = async (e) => {
     e.preventDefault();
+    if (!form.category || !form.name.trim() || !form.desc.trim() || !form.price.trim()) {
+      alert("Please fill in all required fields (Category, Name, Description, Price).");
+      return;
+    }
     setSaving(true);
     try {
       const fd = new FormData();
@@ -231,7 +264,20 @@ const AdminPanel = () => {
         headers: getAuthHeaders(),
         body: fd,
       });
-      if (!res.ok) throw new Error("Failed to save menu item");
+      if (!res.ok) {
+        let errStr = "Failed to save menu item";
+        try {
+          const errData = await res.json();
+          if (errData.error) errStr = errData.error;
+        } catch (e) {}
+        throw new Error(errStr);
+      }
+      const data = await res.json();
+      if (!editingId) {
+        setMenuItems(prev => [data, ...prev]);
+      } else {
+        setMenuItems(prev => prev.map((m) => (m._id === editingId ? data : m)));
+      }
       showToast(editingId ? "✅ Item updated!" : "✅ Item added!");
       resetForm();
       fetchMenu();

@@ -106,6 +106,22 @@ mongoose.connect(MONGO_URI)
     } catch (err) {
       console.error('Failed to seed categories:', err);
     }
+    
+    // Auto-seed Reviews from hardcoded dummy data if missing
+    try {
+      const hasDefault = await Review.findOne({ name: 'Rahul Desai' });
+      if (!hasDefault) {
+        const defaultReviews = [
+          { name: 'Rahul Desai', rating: 5, text: 'My family loved the dinner. Rich flavors, warm service, and a perfect premium dining experience.', status: 'Approved' },
+          { name: 'Sneha Patel', rating: 5, text: 'Amazing quality and beautifully plated food. Everything arrived fresh and exactly on time.', status: 'Approved' },
+          { name: 'Amit Shah', rating: 5, text: 'A very aesthetic and pleasant ambience. Their starters are out of this world. Highly recommend!', status: 'Approved' }
+        ];
+        await Review.insertMany(defaultReviews);
+        console.log('Seeded default reviews.');
+      }
+    } catch (err) {
+      console.error('Failed to seed reviews:', err);
+    }
   })
   .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -119,7 +135,7 @@ const authMiddleware = (req, res, next) => {
     req.admin = decoded;
     next();
   } catch (err) {
-    res.status(400).json({ error: 'Invalid token.' });
+    res.status(401).json({ error: 'Invalid or expired token.' });
   }
 };
 
