@@ -64,6 +64,8 @@ const AdminPanel = () => {
   const [reels, setReels] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [selectedReview, setSelectedReview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const prevPendingRef = useRef(-1);
@@ -1477,7 +1479,7 @@ const AdminPanel = () => {
                     </thead>
                     <tbody>
                       {reservations.map((r) => (
-                        <tr key={r._id}>
+                        <tr key={r._id} onClick={() => setSelectedReservation(r)} className="ap-table-row-clickable" style={{ cursor: "pointer" }}>
                           <td>
                             <div className="ap-item-cell">
                               <div className="ap-dash-avatar">{r.name[0]}</div>
@@ -1523,7 +1525,7 @@ const AdminPanel = () => {
                               {r.status === "Pending" && (
                                 <button
                                   className="ap-icon-btn ap-confirm-btn"
-                                  onClick={() => handleConfirmRes(r._id)}
+                                  onClick={(e) => { e.stopPropagation(); handleConfirmRes(r._id); }}
                                   title="Confirm"
                                 >
                                   <CheckCircle size={16} />
@@ -1531,7 +1533,7 @@ const AdminPanel = () => {
                               )}
                               <button
                                 className="ap-icon-btn ap-del-btn"
-                                onClick={() => handleDeleteRes(r._id)}
+                                onClick={(e) => { e.stopPropagation(); handleDeleteRes(r._id); }}
                                 title="Delete"
                               >
                                 <Trash2 size={16} />
@@ -1551,6 +1553,35 @@ const AdminPanel = () => {
                   </table>
                 </div>
               </div>
+
+              {/* Modal for Reservation Details */}
+              {selectedReservation && (
+                <div className="ap-modal-overlay" onClick={() => setSelectedReservation(null)}>
+                  <div className="ap-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="ap-modal-header">
+                      <h3>Reservation Details</h3>
+                      <button className="ap-modal-close" onClick={() => setSelectedReservation(null)}>
+                        <X size={20} />
+                      </button>
+                    </div>
+                    <div className="ap-modal-body">
+                      <div className="ap-modal-row"><span>Name:</span> <strong>{selectedReservation.name}</strong></div>
+                      <div className="ap-modal-row"><span>Phone:</span> <strong>{selectedReservation.phone}</strong></div>
+                      {selectedReservation.email && <div className="ap-modal-row"><span>Email:</span> <strong>{selectedReservation.email}</strong></div>}
+                      <div className="ap-modal-row"><span>Date:</span> <strong>{selectedReservation.date}</strong></div>
+                      <div className="ap-modal-row"><span>Time:</span> <strong>{selectedReservation.time}</strong></div>
+                      <div className="ap-modal-row"><span>Guests:</span> <strong>{selectedReservation.guests} pax</strong></div>
+                      <div className="ap-modal-row"><span>Status:</span> <strong className={`ap-pill ${selectedReservation.status === "Confirmed" ? "ap-pill-green" : "ap-pill-amber"}`}>{selectedReservation.status}</strong></div>
+                      <div className="ap-modal-row" style={{ flexDirection: 'column', alignItems: 'flex-start', borderBottom: 'none' }}>
+                        <span>Special Requests:</span>
+                        <div style={{ marginTop: '0.5rem', padding: '0.75rem', background: 'var(--ap-input-bg)', borderRadius: '8px', width: '100%', color: 'var(--ap-text)' }}>
+                          {selectedReservation.requests || "No special requests"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1596,7 +1627,7 @@ const AdminPanel = () => {
                     </thead>
                     <tbody>
                       {reviews.map((r) => (
-                        <tr key={r._id}>
+                        <tr key={r._id} onClick={() => setSelectedReview(r)} className="ap-table-row-clickable" style={{ cursor: "pointer" }}>
                           <td>
                             <div className="ap-item-cell">
                               <div className="ap-dash-avatar">{r.name[0]}</div>
@@ -1642,7 +1673,7 @@ const AdminPanel = () => {
                               {r.status === "Pending" && (
                                 <button
                                   className="ap-icon-btn ap-confirm-btn"
-                                  onClick={() => handleApproveReview(r._id)}
+                                  onClick={(e) => { e.stopPropagation(); handleApproveReview(r._id); }}
                                   title="Approve"
                                 >
                                   <CheckCircle size={16} />
@@ -1650,7 +1681,7 @@ const AdminPanel = () => {
                               )}
                               <button
                                 className="ap-icon-btn ap-del-btn"
-                                onClick={() => handleDeleteReview(r._id)}
+                                onClick={(e) => { e.stopPropagation(); handleDeleteReview(r._id); }}
                                 title="Delete"
                               >
                                 <Trash2 size={16} />
@@ -1670,6 +1701,32 @@ const AdminPanel = () => {
                   </table>
                 </div>
               </div>
+
+              {/* Modal for Review Details */}
+              {selectedReview && (
+                <div className="ap-modal-overlay" onClick={() => setSelectedReview(null)}>
+                  <div className="ap-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="ap-modal-header">
+                      <h3>Review Details</h3>
+                      <button className="ap-modal-close" onClick={() => setSelectedReview(null)}>
+                        <X size={20} />
+                      </button>
+                    </div>
+                    <div className="ap-modal-body">
+                      <div className="ap-modal-row"><span>Customer:</span> <strong>{selectedReview.name}</strong></div>
+                      <div className="ap-modal-row"><span>Rating:</span> <strong style={{ color: 'var(--ap-gold)', fontSize: '16px' }}>{"★".repeat(selectedReview.rating)}{"☆".repeat(5 - selectedReview.rating)}</strong></div>
+                      <div className="ap-modal-row"><span>Date:</span> <strong>{new Date(selectedReview.createdAt).toLocaleDateString("en-IN")}</strong></div>
+                      <div className="ap-modal-row"><span>Status:</span> <strong className={`ap-pill ${selectedReview.status === "Approved" ? "ap-pill-green" : "ap-pill-amber"}`}>{selectedReview.status}</strong></div>
+                      <div className="ap-modal-row" style={{ flexDirection: 'column', alignItems: 'flex-start', borderBottom: 'none' }}>
+                        <span>Review:</span>
+                        <div style={{ marginTop: '0.5rem', padding: '0.75rem', background: 'var(--ap-input-bg)', borderRadius: '8px', width: '100%', color: 'var(--ap-text)', whiteSpace: 'pre-wrap' }}>
+                          {selectedReview.text}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
