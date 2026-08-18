@@ -108,6 +108,7 @@ button {
 
 .section {
   padding: 5rem 0;
+  scroll-margin-top: var(--header-height);
 }
 
 .text-center {

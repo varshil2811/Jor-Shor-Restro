@@ -36,7 +36,7 @@ const ReservationContact = () => {
   };
 
   return (
-    <section id="contact" className="contact-section">
+    <section id="contact" className="section contact-section">
       <div className="container">
 
         {/* ── section header ── */}

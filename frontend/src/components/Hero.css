@@ -167,8 +167,8 @@
   }
 
   .hero-content {
-    margin-top: 2rem;
-    align-items: flex-start;
+    align-items: flex-end;
+    padding-bottom: 2rem;
   }
 
   .hero-text {

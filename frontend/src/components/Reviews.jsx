@@ -57,25 +57,25 @@ const renderStars = (rating) => {
 
 const getTimeAgo = (dateString) => {
   if (!dateString) return '7 months ago'; // Fallback for hardcoded initial reviews
-  
+
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now - date) / 1000);
-  
+
   if (diffInSeconds < 60) return 'Just now';
-  
+
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) return `${diffInMinutes} min${diffInMinutes > 1 ? 's' : ''} ago`;
-  
+
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
-  
+
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 30) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
-  
+
   const diffInMonths = Math.floor(diffInDays / 30);
   if (diffInMonths < 12) return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
-  
+
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
 };
@@ -189,9 +189,9 @@ const Reviews = () => {
                     <Star size={12} fill="currentColor" />
                     <span>Verified Reviews</span>
                   </div>
-                  <h3 className="classic-title">Guest<br/><span>Reviews</span></h3>
+                  <h3 className="classic-title">Guest<br /><span>Reviews</span></h3>
                 </div>
-                
+
                 <div className="review-inner-card">
                   <div className="inner-header">
                     <div className="reviewer-avatar">
@@ -202,17 +202,17 @@ const Reviews = () => {
                     </div>
                     <button className="review-options">⋮</button>
                   </div>
-                  
+
                   <div className="inner-rating">
                     <div className="rating-stars">{renderStars(review.rating)}</div>
                     <span className="review-time">{getTimeAgo(review.createdAt)}</span>
                   </div>
-                  
+
                   <p className="review-text">
                     {review.text.length > 85 ? (
                       <>
                         {review.text.substring(0, 85)}...
-                        <button 
+                        <button
                           className="read-more-link"
                           onClick={() => setSelectedReview(review)}
                         >

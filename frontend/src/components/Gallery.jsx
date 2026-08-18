@@ -68,15 +68,15 @@ const Gallery = () => {
         <div className={`text-center reveal ${headerVisible ? 'visible' : ''}`} ref={headerRef}>
           <h2 className="section-title">Gallery</h2>
           <p className="menu-subtitle">A glimpse of our world</p>
-          
+
           <div className="gallery-toggle">
-            <button 
+            <button
               className={`toggle-btn ${activeView === 'photos' ? 'active' : ''}`}
               onClick={() => setActiveView('photos')}
             >
               Photos
             </button>
-            <button 
+            <button
               className={`toggle-btn ${activeView === 'videos' ? 'active' : ''}`}
               onClick={() => setActiveView('videos')}
             >
@@ -102,13 +102,13 @@ const Gallery = () => {
                   <div className="reels-scroll-container">
                     {reels.map(reel => (
                       <div key={reel.id} className="reel-card">
-                        <video 
-                          src={reel.url} 
+                        <video
+                          src={reel.url}
                           className="reel-video"
-                          controls 
-                          muted 
-                          loop 
-                          playsInline 
+                          controls
+                          muted
+                          loop
+                          playsInline
                           preload="metadata"
                         />
                         {reel.title && <div className="reel-caption">{reel.title}</div>}
@@ -170,22 +170,22 @@ const Gallery = () => {
           <button className="lightbox-close" onClick={closeLightbox}>
             <X size={32} />
           </button>
-          
+
           <button className="lightbox-nav prev" onClick={prevImage}>
             <ChevronLeft size={48} />
           </button>
-          
-          <img 
-            src={galleryImages[currentIndex].url} 
-            alt="Gallery" 
+
+          <img
+            src={galleryImages[currentIndex].url}
+            alt="Gallery"
             className="lightbox-img"
             onClick={(e) => e.stopPropagation()}
           />
-          
+
           <button className="lightbox-nav next" onClick={nextImage}>
             <ChevronRight size={48} />
           </button>
-          
+
           <div className="lightbox-caption">
             {currentIndex + 1} / {galleryImages.length}
           </div>
