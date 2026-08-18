@@ -103,9 +103,9 @@ const restaurantFeatures = [
 const About = () => {
   const [showFeatures, setShowFeatures] = useState(false);
   const featuresRef = useRef(null);
-  const [imgRef,     imgVisible]     = useInView(0.2);
+  const [imgRef, imgVisible] = useInView(0.2);
   const [contentRef, contentVisible] = useInView(0.15);
-  const [featsRef,   featsVisible]   = useInView(0.05);
+  const [featsRef, featsVisible] = useInView(0.05);
 
   // Unlock page scroll if a previous modal left body overflow locked
   useEffect(() => {
@@ -138,6 +138,7 @@ const About = () => {
               src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=1000&auto=format&fit=crop"
               alt="Chef preparing food"
               className="about-image"
+              loading="lazy"
             />
             <div className="about-experience-badge">
               <span className="years">15+</span>

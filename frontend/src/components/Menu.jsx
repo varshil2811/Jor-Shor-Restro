@@ -4,6 +4,7 @@ import { Leaf, Flame, ArrowDownToLine, Loader, X, ChevronRight } from 'lucide-re
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useInView } from '../hooks/useInView';
+import { optimizeCloudinaryUrl, generateSrcSet } from '../utils/cloudinary';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
 const DESC_MAX_LENGTH = 70;
@@ -78,7 +79,7 @@ const Menu = () => {
           // Inject fl_attachment after /upload/
           downloadUrl = downloadUrl.replace('/upload/', '/upload/fl_attachment/');
         }
-        
+
         // Open the modified URL which Cloudinary will serve as an attachment download
         window.location.href = downloadUrl;
       } catch (err) {
@@ -208,8 +209,8 @@ const Menu = () => {
 
     window.addEventListener('keydown', handleKeyDown);
 
-    return () => { 
-      document.body.style.overflow = 'auto'; 
+    return () => {
+      document.body.style.overflow = 'auto';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [selectedItem]);
@@ -273,9 +274,12 @@ const Menu = () => {
                         <div className="menu-item-image-wrapper">
                           {item.imageUrl ? (
                             <img
-                              src={item.imageUrl}
+                              src={optimizeCloudinaryUrl(item.imageUrl, { width: 400 })}
+                              srcSet={generateSrcSet(item.imageUrl, [200, 400, 800])}
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               alt={item.name}
                               className="menu-item-image img-fade"
+                              loading="lazy"
                               onLoad={e => e.currentTarget.classList.add('loaded')}
                             />
                           ) : (
@@ -286,7 +290,7 @@ const Menu = () => {
                           <div className="menu-item-price-badge">
                             ₹{String(item.price).replace(/[^0-9.]/g, '')}
                           </div>
-                          
+
                           <div className="menu-item-hover-overlay">
                             <span>View Details</span>
                           </div>
@@ -295,7 +299,7 @@ const Menu = () => {
                         {/* Content Section - Bottom */}
                         <div className="menu-item-content">
                           <h3 className="menu-item-name">{item.name}</h3>
-                          
+
                           {(item.type || item.spice > 0 || item.servingSize) && (
                             <div className="menu-item-tags">
                               {item.type === 'veg' && (
@@ -359,7 +363,7 @@ const Menu = () => {
             </button>
             <div className="menu-modal-image-wrapper">
               {selectedItem.imageUrl ? (
-                <img src={selectedItem.imageUrl} alt={selectedItem.name} className="menu-modal-image" />
+                <img src={optimizeCloudinaryUrl(selectedItem.imageUrl, { width: 800 })} srcSet={generateSrcSet(selectedItem.imageUrl, [400, 800, 1200])} sizes="(max-width: 768px) 100vw, 800px" alt={selectedItem.name} className="menu-modal-image" loading="lazy" />
               ) : (
                 <div className="menu-item-image-placeholder">
                   <span className="placeholder-text">Jor Shor</span>
@@ -369,7 +373,7 @@ const Menu = () => {
             <div className="menu-modal-body">
               <div className="menu-modal-header">
                 <h3 className="menu-modal-name">{selectedItem.name}</h3>
-                
+
                 {(selectedItem.type || selectedItem.spice > 0 || selectedItem.servingSize) && (
                   <div className="menu-item-tags" style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
                     {selectedItem.type === 'veg' && (
@@ -392,13 +396,13 @@ const Menu = () => {
                   </div>
                 )}
               </div>
-              
+
               {selectedItem.desc && (
                 <div className="menu-modal-desc-container">
                   <p className="menu-modal-desc">{selectedItem.desc}</p>
                 </div>
               )}
-              
+
               <div className="menu-modal-footer">
                 <div className="menu-modal-price-badge">
                   <span className="price-currency">₹</span>

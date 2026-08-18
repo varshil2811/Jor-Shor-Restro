@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './Gallery.css';
 import { X, ChevronLeft, ChevronRight, Loader, Play } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
+import { optimizeCloudinaryUrl, generateSrcSet } from '../utils/cloudinary';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
 
@@ -103,13 +104,14 @@ const Gallery = () => {
                     {reels.map(reel => (
                       <div key={reel.id} className="reel-card">
                         <video
-                          src={reel.url}
+                          src={optimizeCloudinaryUrl(reel.url)}
+                          poster={optimizeCloudinaryUrl(reel.url, { isVideoPoster: true, width: 400 })}
                           className="reel-video"
                           controls
                           muted
                           loop
                           playsInline
-                          preload="metadata"
+                          preload="none"
                         />
                         {reel.title && <div className="reel-caption">{reel.title}</div>}
                       </div>
@@ -138,9 +140,12 @@ const Gallery = () => {
                           onClick={() => isLastAndMore ? setShowAll(true) : openLightbox(index)}
                         >
                           <img
-                            src={img.url}
+                            src={optimizeCloudinaryUrl(img.url, { width: 800 })}
+                            srcSet={generateSrcSet(img.url, [400, 800, 1200])}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             alt="Gallery"
                             className="img-fade"
+                            loading="lazy"
                             onLoad={e => e.currentTarget.classList.add('loaded')}
                           />
 
@@ -176,9 +181,12 @@ const Gallery = () => {
           </button>
 
           <img
-            src={galleryImages[currentIndex].url}
+            src={optimizeCloudinaryUrl(galleryImages[currentIndex].url, { width: 1600 })}
+            srcSet={generateSrcSet(galleryImages[currentIndex].url, [800, 1600, 2400])}
+            sizes="100vw"
             alt="Gallery"
             className="lightbox-img"
+            loading="lazy"
             onClick={(e) => e.stopPropagation()}
           />
 

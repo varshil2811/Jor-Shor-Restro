@@ -25,6 +25,7 @@ import {
   Film,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
 
@@ -273,7 +274,7 @@ const AdminPanel = () => {
         try {
           const errData = await res.json();
           if (errData.error) errStr = errData.error;
-        } catch (e) {}
+        } catch (e) { }
         throw new Error(errStr);
       }
       const data = await res.json();
@@ -376,7 +377,7 @@ const AdminPanel = () => {
         : null,
     );
     setImgFile(null);
-    
+
     // Auto-scroll to the form and focus the name input
     setTimeout(() => {
       formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -885,9 +886,9 @@ const AdminPanel = () => {
                       onChange={(e) => setMenuPdfFile(e.target.files[0])}
                       className="ap-custom-file-input"
                     />
-                    <button 
-                      type="submit" 
-                      className="ap-btn ap-btn-primary" 
+                    <button
+                      type="submit"
+                      className="ap-btn ap-btn-primary"
                       disabled={uploadingPdf}
                       style={{ padding: "0.6rem 1.5rem", whiteSpace: "nowrap" }}
                     >
@@ -915,8 +916,8 @@ const AdminPanel = () => {
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       required
                       placeholder="New Category (e.g. DESSERT)"
-                      style={{ 
-                        flex: 1, 
+                      style={{
+                        flex: 1,
                         padding: "0.6rem 1rem",
                         borderRadius: "8px",
                         border: "1px solid var(--ap-input-border)",
@@ -924,9 +925,9 @@ const AdminPanel = () => {
                         color: "var(--ap-text)"
                       }}
                     />
-                    <button 
-                      type="submit" 
-                      className="ap-btn ap-btn-primary" 
+                    <button
+                      type="submit"
+                      className="ap-btn ap-btn-primary"
                       style={{ padding: "0.6rem 1.5rem", whiteSpace: "nowrap" }}
                     >
                       Add
@@ -1162,9 +1163,10 @@ const AdminPanel = () => {
                                   <img
                                     src={
                                       item.imageUrl.startsWith("http")
-                                        ? item.imageUrl
+                                        ? optimizeCloudinaryUrl(item.imageUrl, { width: 100 })
                                         : `http://localhost:5000/uploads/${item.imageUrl}`
                                     }
+                                    loading="lazy"
                                     alt={item.name}
                                   />
                                 ) : (
@@ -1297,7 +1299,7 @@ const AdminPanel = () => {
                 <div className="ap-gallery-grid">
                   {gallery.map((img) => (
                     <div key={img.id} className="ap-gallery-item">
-                      <img src={img.url} alt="gallery" />
+                      <img src={optimizeCloudinaryUrl(img.url, { width: 300 })} loading="lazy" alt="gallery" />
                       <div className="ap-gallery-overlay">
                         <button
                           className="ap-icon-btn ap-del-btn"
@@ -1411,12 +1413,14 @@ const AdminPanel = () => {
                       style={{ aspectRatio: "9/16" }}
                     >
                       <video
-                        src={reel.url}
+                        src={optimizeCloudinaryUrl(reel.url, { width: 300 })}
+                        poster={optimizeCloudinaryUrl(reel.url, { isVideoPoster: true, width: 300 })}
                         style={{
                           width: "100%",
                           height: "100%",
                           objectFit: "cover",
                         }}
+                        preload="none"
                         muted
                         loop
                         playsInline
