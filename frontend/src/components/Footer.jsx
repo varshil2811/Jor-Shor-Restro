@@ -22,7 +22,7 @@ const Footer = () => {
             <div className="social-links">
               <a href="https://www.instagram.com/jorshor_restaurant_and_banquet?igsh=OTBvM21nY3pqcG42" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram size={20} /></a>
               <a href="https://www.facebook.com/share/14p1VzRCfz4/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebook size={20} /></a>
-              <a href="#" aria-label="WhatsApp" className="whatsapp-link"><FaWhatsapp size={20} /></a>
+              <a href="https://wa.me/918866633008" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="whatsapp-link"><FaWhatsapp size={20} /></a>
             </div>
           </div>
           
@@ -46,7 +46,7 @@ const Footer = () => {
               </li>
               <li>
                 <Phone size={18} className="footer-icon" />
-                <a href="tel:+919876543210">+91 98765 43210</a>
+                <a href="tel:+918866633008">+91 88666 33008</a>
               </li>
               <li>
                 <Mail size={18} className="footer-icon" />

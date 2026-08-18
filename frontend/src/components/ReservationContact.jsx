@@ -10,8 +10,8 @@ const ReservationContact = () => {
   });
   const [status, setStatus] = useState(null);
   const [headerRef, headerVisible] = useInView(0.2);
-  const [formRef,   formVisible]   = useInView(0.1);
-  const [infoRef,   infoVisible]   = useInView(0.1);
+  const [formRef, formVisible] = useInView(0.1);
+  const [infoRef, infoVisible] = useInView(0.1);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,7 +27,7 @@ const ReservationContact = () => {
       });
       if (res.ok) {
         setStatus('success');
-        setFormData({ name:'', phone:'', email:'', date:'', time:'', guests:'2', requests:'' });
+        setFormData({ name: '', phone: '', email: '', date: '', time: '', guests: '2', requests: '' });
         setTimeout(() => setStatus(null), 5000);
       }
     } catch (err) {
@@ -78,7 +78,7 @@ const ReservationContact = () => {
                   <input
                     type="tel" id="phone" name="phone" required
                     pattern="[0-9]{10}" title="10-digit mobile number"
-                    placeholder="9876543210"
+                    placeholder="8866633008"
                     value={formData.phone} onChange={handleChange}
                   />
                 </div>
@@ -104,15 +104,15 @@ const ReservationContact = () => {
                 </div>
                 <div className="form-group">
                   <label htmlFor="guests">Guests *</label>
-                  <input 
-                    type="number" 
-                    id="guests" 
-                    name="guests" 
+                  <input
+                    type="number"
+                    id="guests"
+                    name="guests"
                     min="1"
                     placeholder="Enter number of guests"
-                    required 
-                    value={formData.guests} 
-                    onChange={handleChange} 
+                    required
+                    value={formData.guests}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -153,7 +153,7 @@ const ReservationContact = () => {
                   <div className="contact-icon"><Phone size={18} /></div>
                   <div>
                     <h4>Phone</h4>
-                    <p><a href="tel:+919876543210">+91 98765 43210</a></p>
+                    <p><a href="tel:+918866633008">+91 88666 33008</a></p>
                   </div>
                 </div>
 
@@ -177,10 +177,10 @@ const ReservationContact = () => {
             </div>
 
             {/* Map */}
-            <a 
-              href="https://maps.google.com/?q=Jor+Shor+Restro,+Pramukh+Arcade+2,+Kudasan,+Gandhinagar,+Gujarat+382421" 
-              target="_blank" 
-              rel="noreferrer" 
+            <a
+              href="https://maps.google.com/?q=Jor+Shor+Restro,+Pramukh+Arcade+2,+Kudasan,+Gandhinagar,+Gujarat+382421"
+              target="_blank"
+              rel="noreferrer"
               className="map-card"
             >
               <div className="map-overlay"></div>
