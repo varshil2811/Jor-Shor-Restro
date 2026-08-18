@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import './Menu.css';
-import { Leaf, Flame, ArrowDownToLine, Loader, X } from 'lucide-react';
+import { Leaf, Flame, ArrowDownToLine, Loader, X, ChevronRight } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useInView } from '../hooks/useInView';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
 const DESC_MAX_LENGTH = 70;
 
 const Menu = () => {
@@ -16,7 +16,7 @@ const Menu = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [customPdfUrl, setCustomPdfUrl] = useState(null);
-  const [showAllItems, setShowAllItems] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(4);
   const [headerRef, headerVisible] = useInView();
   const [gridRef, gridVisible] = useInView();
 
@@ -57,7 +57,7 @@ const Menu = () => {
     setIsTransitioning(true);
     setTimeout(() => {
       setActiveCategory(newCategory);
-      setShowAllItems(false);
+      setVisibleCount(4);
       setIsTransitioning(false);
     }, 300);
   };
@@ -66,10 +66,8 @@ const Menu = () => {
     ? { category: 'ALL', items: menuData.flatMap(c => c.items) }
     : menuData.find(c => c.category === activeCategory);
 
-  const displayedItemsCount = currentCategoryData?.items
-    ? (showAllItems ? currentCategoryData.items.length : Math.min(currentCategoryData.items.length, 3))
-    : 0;
-  const isFewItems = displayedItemsCount > 0 && displayedItemsCount < 3;
+  const displayedItemsCount = currentCategoryData?.items ? Math.min(currentCategoryData.items.length, visibleCount) : 0;
+  const isFewItems = displayedItemsCount > 0 && displayedItemsCount < 4;
 
   const downloadPDF = async () => {
     if (customPdfUrl) {
@@ -189,7 +187,19 @@ const Menu = () => {
     } else {
       document.body.style.overflow = 'auto';
     }
-    return () => { document.body.style.overflow = 'auto'; };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedItem(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => { 
+      document.body.style.overflow = 'auto'; 
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [selectedItem]);
 
   return (
@@ -243,15 +253,10 @@ const Menu = () => {
             <div className={`menu-transition-wrapper ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
               <div key={activeCategory} className={`menu-grid stagger ${gridVisible && !isTransitioning ? 'visible' : ''} ${isFewItems ? 'menu-grid-few' : ''}`} ref={gridRef}>
                 {currentCategoryData?.items
-                  .slice(0, showAllItems ? currentCategoryData.items.length : 3)
+                  .slice(0, visibleCount)
                   .map((item) => {
-                    const shouldTruncate = item.desc && item.desc.length > DESC_MAX_LENGTH;
-                    const displayDesc = shouldTruncate
-                      ? item.desc.substring(0, DESC_MAX_LENGTH) + '...'
-                      : item.desc;
-
                     return (
-                      <div key={item._id} className="menu-item-card">
+                      <div key={item._id || item.id} className="menu-item-card" onClick={() => setSelectedItem(item)}>
                         {/* Image Section - Top */}
                         <div className="menu-item-image-wrapper">
                           {item.imageUrl ? (
@@ -266,46 +271,43 @@ const Menu = () => {
                               <span className="placeholder-text">Jor Shor</span>
                             </div>
                           )}
+                          <div className="menu-item-price-badge">
+                            ₹{String(item.price).replace(/[^0-9.]/g, '')}
+                          </div>
+                          
+                          <div className="menu-item-hover-overlay">
+                            <span>View Details</span>
+                          </div>
                         </div>
 
                         {/* Content Section - Bottom */}
                         <div className="menu-item-content">
-                          <div className="menu-item-header">
-                            <h3 className="menu-item-name">
-                              <span className="name-text">{item.name}</span>
-                            </h3>
-                          </div>
-
-                          <div className="menu-item-tags">
-                            {item.type === 'veg' ? (
-                              <span className="tag-pill tag-veg" title="Vegetarian"><div className="dot"></div>Veg</span>
-                            ) : (
-                              <span className="tag-pill tag-non-veg" title="Non-Vegetarian"><div className="dot"></div>Non-Veg</span>
-                            )}
-                            {item.spice > 0 && (
-                              <span className="tag-pill tag-spice">
-                                {[...Array(item.spice)].map((_, i) => (
-                                  <Flame key={i} size={11} color="#b4a081" style={{ marginRight: '1px' }} />
-                                ))}
-                                Spicy
-                              </span>
-                            )}
-                          </div>
-
-                          <p className="menu-item-desc">
-                            {displayDesc}
-                            {shouldTruncate && (
-                              <button className="btn-read-more" onClick={() => setSelectedItem(item)}>
-                                show more
-                              </button>
-                            )}
-                          </p>
-
-                          <div className="menu-item-footer">
-                            <div className="menu-item-price-modern">
-                              <span className="price-currency">₹</span>
-                              <span className="price-amount">{String(item.price).replace(/[^0-9.]/g, '')}</span>
+                          <h3 className="menu-item-name">{item.name}</h3>
+                          
+                          {(item.type || item.spice > 0 || item.servingSize) && (
+                            <div className="menu-item-tags">
+                              {item.type === 'veg' && (
+                                <span className="tag-pill tag-veg" title="Vegetarian"><div className="dot"></div>Veg</span>
+                              )}
+                              {item.type === 'non-veg' && (
+                                <span className="tag-pill tag-non-veg" title="Non-Vegetarian"><div className="dot"></div>Non-Veg</span>
+                              )}
+                              {item.spice > 0 && (
+                                <span className="tag-pill tag-spice">
+                                  {[...Array(item.spice)].map((_, i) => (
+                                    <Flame key={i} size={11} color="#b4a081" style={{ marginRight: '1px' }} />
+                                  ))}
+                                  Spicy
+                                </span>
+                              )}
+                              {item.servingSize && (
+                                <span className="tag-pill tag-serve">{item.servingSize}</span>
+                              )}
                             </div>
+                          )}
+
+                          <div className="menu-item-mobile-hint">
+                            Tap for details <ChevronRight size={14} />
                           </div>
                         </div>
                       </div>
@@ -319,14 +321,14 @@ const Menu = () => {
                 </div>
               )}
 
-              {currentCategoryData?.items && currentCategoryData.items.length > 3 && (
+              {currentCategoryData?.items && currentCategoryData.items.length > visibleCount && (
                 <div className="text-center" style={{ marginTop: '2.5rem' }}>
                   <button
                     className="btn btn-primary"
                     style={{ padding: '0.6rem 2rem' }}
-                    onClick={() => setShowAllItems(!showAllItems)}
+                    onClick={() => setVisibleCount(prev => prev + 4)}
                   >
-                    {showAllItems ? 'View Less' : 'View More Items'}
+                    More Items
                   </button>
                 </div>
               )}
@@ -354,27 +356,39 @@ const Menu = () => {
             </div>
             <div className="menu-modal-body">
               <div className="menu-modal-header">
-                <h3 className="menu-modal-name">
-                  <span className="name-text">{selectedItem.name}</span>
-                  {selectedItem.type === 'veg' ? (
-                    <span className="type-icon veg" title="Vegetarian"><div className="dot"></div></span>
-                  ) : (
-                    <span className="type-icon non-veg" title="Non-Vegetarian"><div className="dot"></div></span>
-                  )}
-                </h3>
-                {selectedItem.spice > 0 && (
-                  <div className="menu-modal-spice">
-                    {[...Array(selectedItem.spice)].map((_, i) => (
-                      <Flame key={i} size={18} color="#ff4500" />
-                    ))}
+                <h3 className="menu-modal-name">{selectedItem.name}</h3>
+                
+                {(selectedItem.type || selectedItem.spice > 0 || selectedItem.servingSize) && (
+                  <div className="menu-item-tags" style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
+                    {selectedItem.type === 'veg' && (
+                      <span className="tag-pill tag-veg" title="Vegetarian"><div className="dot"></div>Veg</span>
+                    )}
+                    {selectedItem.type === 'non-veg' && (
+                      <span className="tag-pill tag-non-veg" title="Non-Vegetarian"><div className="dot"></div>Non-Veg</span>
+                    )}
+                    {selectedItem.spice > 0 && (
+                      <span className="tag-pill tag-spice">
+                        {[...Array(selectedItem.spice)].map((_, i) => (
+                          <Flame key={i} size={13} color="#b4a081" style={{ marginRight: '2px' }} />
+                        ))}
+                        Spicy
+                      </span>
+                    )}
+                    {selectedItem.servingSize && (
+                      <span className="tag-pill tag-serve">{selectedItem.servingSize}</span>
+                    )}
                   </div>
                 )}
               </div>
-              <div className="menu-modal-desc-container">
-                <p className="menu-modal-desc">{selectedItem.desc}</p>
-              </div>
+              
+              {selectedItem.desc && (
+                <div className="menu-modal-desc-container">
+                  <p className="menu-modal-desc">{selectedItem.desc}</p>
+                </div>
+              )}
+              
               <div className="menu-modal-footer">
-                <div className="price-pill modal-price">
+                <div className="menu-modal-price-badge">
                   <span className="price-currency">₹</span>
                   <span className="price-amount">{String(selectedItem.price).replace(/[^0-9.]/g, '')}</span>
                 </div>

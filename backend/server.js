@@ -157,6 +157,7 @@ app.post('/api/admin/login', (req, res) => {
 
 // Get all menu items mapped by defined Categories
 app.get('/api/menu', async (req, res) => {
+  console.log('GET /api/menu called');
   try {
     const categories = await Category.find().sort({ createdAt: 1 });
     const items = await MenuItem.find().sort({ createdAt: -1 });

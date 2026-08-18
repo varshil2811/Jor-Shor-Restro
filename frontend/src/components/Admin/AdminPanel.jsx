@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
 
 /* ─── tiny helpers ─────────────────────────────── */
 const Toast = ({ msg, onClose }) => (
@@ -69,6 +69,8 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const prevPendingRef = useRef(-1);
+  const formRef = useRef(null);
+  const nameInputRef = useRef(null);
 
   /* form state */
   const [form, setForm] = useState({
@@ -374,7 +376,12 @@ const AdminPanel = () => {
         : null,
     );
     setImgFile(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    
+    // Auto-scroll to the form and focus the name input
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      nameInputRef.current?.focus();
+    }, 100);
   };
 
   const handleDeleteMenu = async (id) => {
@@ -971,7 +978,7 @@ const AdminPanel = () => {
                 </div>
 
                 {/* add/edit item form */}
-                <div className="ap-card">
+                <div className="ap-card" ref={formRef}>
                   <h3 className="ap-card-title">
                     {editingId ? (
                       <>
@@ -1007,6 +1014,7 @@ const AdminPanel = () => {
                       <div className="ap-field">
                         <label>Item Name</label>
                         <input
+                          ref={nameInputRef}
                           name="name"
                           value={form.name}
                           onChange={handleFormChange}
