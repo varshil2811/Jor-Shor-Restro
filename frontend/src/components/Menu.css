@@ -178,17 +178,23 @@
 /* ── Badge Price ── */
 .menu-item-price-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: linear-gradient(135deg, var(--accent-gold) 0%, #9e8c70 100%);
-  color: #1a130e;
-  padding: 4px 12px;
-  border-radius: 20px;
+  top: 12px;
+  right: 12px;
+  background: rgba(44, 58, 48, 0.95); /* var(--primary-dark) with opacity */
+  color: var(--accent-gold);
+  padding: 6px 14px;
+  border-radius: 8px;
   font-weight: 700;
-  font-size: 0.9rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   z-index: 2;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 1px solid rgba(180, 160, 129, 0.3);
+  backdrop-filter: blur(4px);
 }
 
 /* ── content ── */
