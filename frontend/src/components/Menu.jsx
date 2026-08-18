@@ -71,8 +71,20 @@ const Menu = () => {
 
   const downloadPDF = async () => {
     if (customPdfUrl) {
-      // If a custom PDF is uploaded, download it directly
-      window.open(customPdfUrl, '_blank');
+      // Force Cloudinary to trigger a direct file download by injecting fl_attachment
+      try {
+        let downloadUrl = customPdfUrl;
+        if (downloadUrl.includes('cloudinary.com') && !downloadUrl.includes('fl_attachment')) {
+          // Inject fl_attachment after /upload/
+          downloadUrl = downloadUrl.replace('/upload/', '/upload/fl_attachment/');
+        }
+        
+        // Open the modified URL which Cloudinary will serve as an attachment download
+        window.location.href = downloadUrl;
+      } catch (err) {
+        console.error('Failed to parse Cloudinary URL for download:', err);
+        window.open(customPdfUrl, '_blank'); // fallback
+      }
       return;
     }
 
@@ -218,7 +230,7 @@ const Menu = () => {
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   <ArrowDownToLine size={18} />
-                  <span>Download Full PDF Menu</span>
+                  <span>Download Full Menu</span>
                 </div>
               )}
             </button>

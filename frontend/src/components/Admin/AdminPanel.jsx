@@ -860,14 +860,14 @@ const AdminPanel = () => {
                 {/* menu pdf upload form */}
                 <div className="ap-card">
                   <h3 className="ap-card-title">
-                    <Plus size={16} /> Manage Full PDF Menu
+                    <Plus size={16} /> Manage Full Menu File
                   </h3>
                   <div style={{ marginBottom: '1rem', color: 'var(--ap-text-muted)', fontSize: '0.9rem' }}>
-                    Upload a custom PDF menu for visitors to download. If not uploaded, a PDF will be generated automatically.
+                    Upload a custom PDF or Image for your menu. If not uploaded, a PDF will be generated automatically.
                   </div>
                   {menuPdfUrl && (
                     <div style={{ marginBottom: '1rem' }}>
-                      <strong>Current PDF:</strong> <a href={menuPdfUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--ap-gold)' }}>View Uploaded PDF</a>
+                      <strong>Current File:</strong> <a href={menuPdfUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--ap-gold)' }}>View Uploaded File</a>
                     </div>
                   )}
                   <form
@@ -881,7 +881,7 @@ const AdminPanel = () => {
                     <input
                       id="menu-pdf-upload"
                       type="file"
-                      accept="application/pdf"
+                      accept="application/pdf,image/*"
                       onChange={(e) => setMenuPdfFile(e.target.files[0])}
                       className="ap-custom-file-input"
                     />
@@ -891,7 +891,7 @@ const AdminPanel = () => {
                       disabled={uploadingPdf}
                       style={{ padding: "0.6rem 1.5rem", whiteSpace: "nowrap" }}
                     >
-                      {uploadingPdf ? "Uploading..." : "Upload PDF"}
+                      {uploadingPdf ? "Uploading..." : "Upload File"}
                     </button>
                   </form>
                 </div>

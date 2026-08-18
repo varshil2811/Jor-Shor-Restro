@@ -317,13 +317,28 @@ app.get('/api/settings/:key', async (req, res) => {
   }
 });
 
-// Upload Menu PDF and save to setting
+// Upload Menu File and save to setting
 app.post('/api/settings/menu-pdf', authMiddleware, upload.single('pdf'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: 'PDF file is required' });
+    if (!req.file) return res.status(400).json({ error: 'File is required' });
     
-    // Upload PDF to Cloudinary as raw file type
-    const result = await uploadToCloudinary(req.file.buffer, 'jorshor/settings', 'raw');
+    const ext = path.extname(req.file.originalname) || '.pdf';
+    
+    // Upload File to Cloudinary with explicit extension
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { 
+          folder: 'jorshor/settings', 
+          resource_type: 'auto',
+          public_id: `menu_${Date.now()}${ext}`
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
     
     // Update or create setting
     const setting = await Setting.findOneAndUpdate(
