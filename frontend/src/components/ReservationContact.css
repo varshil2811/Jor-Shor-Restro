@@ -39,7 +39,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  padding-top: 5.5rem;
+  padding-top: 2.5rem;
   padding-bottom: 1.5rem;
 }
 
@@ -405,8 +405,8 @@
 ═══════════════════════════════════ */
 @media (max-width: 991px) {
   .contact-section>.container {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
+    padding-top: 2.5rem;
+    padding-bottom: 3rem;
   }
 
   .contact-section-header {
@@ -426,8 +426,8 @@
   }
 
   .contact-section>.container {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
   }
 
   .reservation-form-container {
@@ -450,8 +450,8 @@
 
 @media (max-width: 480px) {
   .contact-section>.container {
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
   }
 
   .contact-grid {

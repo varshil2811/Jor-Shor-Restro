@@ -198,7 +198,7 @@ const Menu = () => {
         <div className={`text-center reveal ${headerVisible ? 'visible' : ''}`} ref={headerRef}>
           <h2 className="section-title">Our Menu</h2>
           <p className="menu-subtitle">Discover our culinary delights</p>
-          <div className="download-btn-wrapper" style={{ margin: '0 auto 1.5rem', width: '100%', padding: '0 1rem', boxSizing: 'border-box' }}>
+          <div className="download-btn-wrapper" style={{ margin: '0 auto 1rem', width: '100%', padding: '0 1rem', boxSizing: 'border-box' }}>
             <button className="btn btn-secondary" onClick={downloadPDF} disabled={pdfLoading || loading} style={{ whiteSpace: 'normal', height: 'auto', padding: '0.8rem 1rem', width: '100%', maxWidth: '350px' }}>
               {pdfLoading ? (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>

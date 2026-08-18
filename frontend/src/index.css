@@ -107,8 +107,8 @@ button {
 }
 
 .section {
-  padding: 5rem 0;
-  scroll-margin-top: var(--header-height);
+  padding: 3.5rem 0;
+  scroll-margin-top: 72px;
 }
 
 .text-center {
@@ -276,6 +276,7 @@ button {
 
   .section {
     padding: 3rem 0;
+    scroll-margin-top: 64px;
   }
 
   .container {
@@ -302,6 +303,7 @@ button {
 
   .section {
     padding: 2.5rem 0;
+    scroll-margin-top: 58px;
   }
 
   .container {
