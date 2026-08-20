@@ -136,7 +136,7 @@ const Gallery = () => {
                       return (
                         <div
                           key={img.id}
-                          className="gallery-item"
+                          className="gallery-item skeleton-bg"
                           onClick={() => isLastAndMore ? setShowAll(true) : openLightbox(index)}
                         >
                           <img
@@ -145,7 +145,8 @@ const Gallery = () => {
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             alt="Gallery"
                             className="img-fade"
-                            loading="lazy"
+                            loading={index < 6 ? "eager" : "lazy"}
+                            fetchPriority={index < 6 ? "high" : "auto"}
                             onLoad={e => e.currentTarget.classList.add('loaded')}
                           />
 
@@ -185,8 +186,9 @@ const Gallery = () => {
             srcSet={generateSrcSet(galleryImages[currentIndex].url, [800, 1600, 2400])}
             sizes="100vw"
             alt="Gallery"
-            className="lightbox-img"
+            className="lightbox-img img-fade"
             loading="lazy"
+            onLoad={e => e.currentTarget.classList.add('loaded')}
             onClick={(e) => e.stopPropagation()}
           />
 

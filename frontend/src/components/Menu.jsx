@@ -267,11 +267,11 @@ const Menu = () => {
               <div key={activeCategory} className={`menu-grid stagger ${gridVisible && !isTransitioning ? 'visible' : ''} ${isFewItems ? 'menu-grid-few' : ''}`} ref={gridRef}>
                 {currentCategoryData?.items
                   .slice(0, visibleCount)
-                  .map((item) => {
+                  .map((item, index) => {
                     return (
                       <div key={item._id || item.id} className="menu-item-card" onClick={() => setSelectedItem(item)}>
                         {/* Image Section - Top */}
-                        <div className="menu-item-image-wrapper">
+                        <div className="menu-item-image-wrapper skeleton-bg">
                           {item.imageUrl ? (
                             <img
                               src={optimizeCloudinaryUrl(item.imageUrl, { width: 400 })}
@@ -279,7 +279,8 @@ const Menu = () => {
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               alt={item.name}
                               className="menu-item-image img-fade"
-                              loading="lazy"
+                              loading={index < 4 ? "eager" : "lazy"}
+                              fetchPriority={index < 4 ? "high" : "auto"}
                               onLoad={e => e.currentTarget.classList.add('loaded')}
                             />
                           ) : (
@@ -361,9 +362,9 @@ const Menu = () => {
             <button className="menu-modal-close" onClick={() => setSelectedItem(null)}>
               <X size={24} />
             </button>
-            <div className="menu-modal-image-wrapper">
+            <div className="menu-modal-image-wrapper skeleton-bg">
               {selectedItem.imageUrl ? (
-                <img src={optimizeCloudinaryUrl(selectedItem.imageUrl, { width: 800 })} srcSet={generateSrcSet(selectedItem.imageUrl, [400, 800, 1200])} sizes="(max-width: 768px) 100vw, 800px" alt={selectedItem.name} className="menu-modal-image" loading="lazy" />
+                <img src={optimizeCloudinaryUrl(selectedItem.imageUrl, { width: 800 })} srcSet={generateSrcSet(selectedItem.imageUrl, [400, 800, 1200])} sizes="(max-width: 768px) 100vw, 800px" alt={selectedItem.name} className="menu-modal-image img-fade" loading="lazy" onLoad={e => e.currentTarget.classList.add('loaded')} />
               ) : (
                 <div className="menu-item-image-placeholder">
                   <span className="placeholder-text">Jor Shor</span>
