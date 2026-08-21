@@ -617,66 +617,99 @@ const AdminPanel = () => {
     return (
       <div
         className="ap-root"
-        style={{ justifyContent: "center", alignItems: "center" }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          background: "radial-gradient(circle at top right, #3e493d 0%, #2f3d35 40%, #1e2822 100%)",
+        }}
       >
         <div
           className="ap-card"
-          style={{ maxWidth: 400, width: "90%", padding: "2rem" }}
+          style={{
+            maxWidth: 420,
+            width: "90%",
+            padding: "3rem 2.5rem",
+            background: "rgba(47, 61, 53, 0.6)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            boxShadow: "0 12px 40px rgba(0, 0, 0, 0.5)",
+            borderRadius: "16px",
+          }}
         >
-          <h2
-            style={{
-              color: "var(--ap-text)",
-              textAlign: "center",
-              marginBottom: "1.5rem",
-            }}
-          >
-            Admin Login
-          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
+            <div style={{
+              width: '56px', height: '56px', borderRadius: '14px',
+              background: 'linear-gradient(135deg, #b4a081, #9e8c70)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: '800', fontSize: '24px', color: '#34453a',
+              marginBottom: '1rem', boxShadow: '0 4px 14px rgba(180, 160, 129, 0.3)'
+            }}>JS</div>
+            <h2 style={{ color: "var(--ap-text)", textAlign: "center", margin: 0, fontSize: '22px' }}>
+              Jor Shor Admin
+            </h2>
+            <p style={{ color: "var(--ap-text-muted)", fontSize: '13px', marginTop: '6px' }}>Secure Login Portal</p>
+          </div>
+          
           {loginError && (
             <div
               className="ap-sub"
               style={{
                 color: "var(--ap-red)",
+                background: "rgba(239, 68, 68, 0.1)",
+                padding: "10px",
+                borderRadius: "8px",
                 textAlign: "center",
-                marginBottom: "1rem",
+                marginBottom: "1.5rem",
+                border: "1px solid rgba(239, 68, 68, 0.2)"
               }}
             >
               {loginError}
             </div>
           )}
-          <form className="ap-form" onSubmit={handleLogin}>
+          
+          <form className="ap-form" onSubmit={handleLogin} style={{ gap: '1.25rem' }}>
             <div className="ap-field">
-              <label>Username</label>
-              <input
-                type="text"
-                required
-                value={loginForm.username}
-                onChange={(e) =>
-                  setLoginForm({ ...loginForm, username: e.target.value })
-                }
-              />
+              <label style={{ fontSize: '11px', letterSpacing: '1px' }}>Username</label>
+              <div style={{ position: 'relative' }}>
+                <User size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ap-text-muted)' }} />
+                <input
+                  type="text"
+                  required
+                  value={loginForm.username}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, username: e.target.value })
+                  }
+                  placeholder="Enter username"
+                  style={{ paddingLeft: '42px', height: '48px', fontSize: '15px' }}
+                />
+              </div>
             </div>
             <div className="ap-field">
-              <label>Password</label>
-              <input
-                type="password"
-                required
-                value={loginForm.password}
-                onChange={(e) =>
-                  setLoginForm({ ...loginForm, password: e.target.value })
-                }
-              />
+              <label style={{ fontSize: '11px', letterSpacing: '1px' }}>Password</label>
+              <div style={{ position: 'relative' }}>
+                <Lock size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ap-text-muted)' }} />
+                <input
+                  type="password"
+                  required
+                  value={loginForm.password}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, password: e.target.value })
+                  }
+                  placeholder="Enter password"
+                  style={{ paddingLeft: '42px', height: '48px', fontSize: '15px' }}
+                />
+              </div>
             </div>
             <button
               type="submit"
               className="ap-btn ap-btn-primary"
-              style={{ marginTop: "1rem" }}
+              style={{ marginTop: "1rem", height: '48px', fontSize: '15px', width: '100%', boxShadow: '0 4px 14px rgba(180, 160, 129, 0.2)' }}
             >
-              Login
+              Sign In
             </button>
           </form>
-          <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
-            <Link to="/" className="ap-link">
+          <div style={{ textAlign: "center", marginTop: "2rem" }}>
+            <Link to="/" className="ap-link" style={{ fontSize: '13px', opacity: 0.8 }}>
               ← Back to Main Site
             </Link>
           </div>
