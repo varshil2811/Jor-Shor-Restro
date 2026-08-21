@@ -23,6 +23,9 @@ import {
   Flame,
   Leaf,
   Film,
+  Settings,
+  User,
+  Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
@@ -100,6 +103,30 @@ const AdminPanel = () => {
   const [menuPdfFile, setMenuPdfFile] = useState(null);
   const [menuPdfUrl, setMenuPdfUrl] = useState(null);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+
+  /* change password state */
+  const [cpForm, setCpForm] = useState({ newUsername: "", newPassword: "" });
+  const [cpSaving, setCpSaving] = useState(false);
+
+  const handleCpSubmit = async (e) => {
+    e.preventDefault();
+    setCpSaving(true);
+    try {
+      const res = await fetch(`${API_URL}/admin/change-password`, {
+        method: "POST",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify(cpForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update credentials");
+      showToast("✅ Credentials updated successfully!");
+      setCpForm({ newUsername: "", newPassword: "" });
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCpSaving(false);
+    }
+  };
 
   const showToast = (msg) => {
     setToast(msg);
@@ -552,6 +579,7 @@ const AdminPanel = () => {
       label: "Reviews",
       badge: pendingRev,
     },
+    { key: "settings", icon: <Settings size={18} />, label: "Settings" },
   ];
 
   const navigate = (key) => {
@@ -1739,6 +1767,64 @@ const AdminPanel = () => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ══════════ SETTINGS ══════════ */}
+          {activeTab === "settings" && (
+            <div className="ap-fade" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <div className="ap-card" style={{ maxWidth: '500px', width: '100%', padding: '2.5rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', textAlign: 'center' }}>
+                  <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--ap-gold-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', color: 'var(--ap-gold)' }}>
+                    <Settings size={30} />
+                  </div>
+                  <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--ap-text)', margin: '0 0 0.5rem 0' }}>
+                    Admin Credentials
+                  </h3>
+                  <p style={{ color: 'var(--ap-text-muted)', fontSize: '0.95rem', margin: 0, lineHeight: '1.4' }}>
+                    Update the username and password used to access the secure admin panel.
+                  </p>
+                </div>
+
+                <form onSubmit={handleCpSubmit} className="ap-form" style={{ gap: '1.25rem' }}>
+                  <div className="ap-field">
+                    <label style={{ fontSize: '11px', letterSpacing: '1px' }}>New Username</label>
+                    <div style={{ position: 'relative' }}>
+                      <User size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ap-text-muted)' }} />
+                      <input
+                        type="text"
+                        required
+                        value={cpForm.newUsername}
+                        onChange={(e) => setCpForm({ ...cpForm, newUsername: e.target.value })}
+                        placeholder="Enter new username"
+                        style={{ paddingLeft: '42px', height: '48px', fontSize: '15px' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="ap-field">
+                    <label style={{ fontSize: '11px', letterSpacing: '1px' }}>New Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <Lock size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ap-text-muted)' }} />
+                      <input
+                        type="password"
+                        required
+                        value={cpForm.newPassword}
+                        onChange={(e) => setCpForm({ ...cpForm, newPassword: e.target.value })}
+                        placeholder="Enter new password"
+                        style={{ paddingLeft: '42px', height: '48px', fontSize: '15px' }}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="ap-btn ap-btn-primary"
+                    disabled={cpSaving}
+                    style={{ height: '48px', fontSize: '15px', marginTop: '0.5rem', boxShadow: '0 4px 14px rgba(180, 160, 129, 0.2)' }}
+                  >
+                    {cpSaving ? "Updating Credentials..." : "Update Credentials"}
+                  </button>
+                </form>
+              </div>
             </div>
           )}
         </div>

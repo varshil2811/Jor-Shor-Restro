@@ -153,6 +153,37 @@ app.post('/api/admin/login', (req, res) => {
   }
 });
 
+app.post('/api/admin/change-password', authMiddleware, (req, res) => {
+  const { newUsername, newPassword } = req.body;
+  if (!newUsername || !newPassword) {
+    return res.status(400).json({ error: 'New username and password are required' });
+  }
+
+  try {
+    const envPath = path.join(__dirname, '.env');
+    if (fs.existsSync(envPath)) {
+      let envFile = fs.readFileSync(envPath, 'utf8');
+      
+      envFile = envFile.replace(/^ADMIN_USERNAME=.*$/m, `ADMIN_USERNAME=${newUsername}`);
+      envFile = envFile.replace(/^ADMIN_PASSWORD=.*$/m, `ADMIN_PASSWORD=${newPassword}`);
+      
+      // If they were not present, append them
+      if (!/^ADMIN_USERNAME=/m.test(envFile)) envFile += `\nADMIN_USERNAME=${newUsername}`;
+      if (!/^ADMIN_PASSWORD=/m.test(envFile)) envFile += `\nADMIN_PASSWORD=${newPassword}`;
+      
+      fs.writeFileSync(envPath, envFile);
+    }
+    
+    // Update process.env for current runtime
+    process.env.ADMIN_USERNAME = newUsername;
+    process.env.ADMIN_PASSWORD = newPassword;
+    
+    res.json({ message: 'Credentials updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update credentials' });
+  }
+});
+
 // --- Menu Routes ---
 
 // Get all menu items mapped by defined Categories
